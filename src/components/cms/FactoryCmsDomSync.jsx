@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { getCmsSchema } from "@/lib/cms";
+import { getCmsSchema, normalizeCmsBodyHtml } from "@/lib/cms";
 
 // Client-side CRM fetch — bypasses server ISR cache so publishes appear immediately.
 function resolveCmsClientBase() {
@@ -56,12 +56,13 @@ const BULLET_BODY_SECTION_KEYS = new Set(["penalties", "benefits"]);
 // Exported so CmsDynamicLandingPage can apply identical CMS rich-text styling
 // when server-rendering a unified `contentBody` (single ordered section, see
 // runSync's isUnifiedBody branch below) instead of the legacy per-section shells.
-// [&_h2]:relative + pl-12/md:pl-16 reserve the decorative heading icon's
-// footprint (ensureHeadingIcon below inserts it absolutely-positioned) from
-// the very first server-rendered paint — otherwise the icon lands after
-// hydration and reflows heading text, a real CLS hit on every CMS page.
+// [&_h2]:border-l-4 gives every CMS h2 a theme-colored "pole" accent — same
+// treatment h3 already uses below — instead of the old client-injected icon
+// (which also caused CLS: it landed after hydration and reflowed the text).
+// It's pure CSS, present from the very first server-rendered paint, so there's
+// no shift and no per-heading JS work.
 export const CMS_RICH_TEXT_CLASS =
-  "cms-rich-text max-w-full min-w-0 break-words text-gray-800 text-sm md:text-base leading-relaxed space-y-4 [&_h2]:relative [&_h2]:pl-12 [&_h2]:md:pl-16 [&_h2]:text-2xl [&_h2]:md:text-4xl [&_h2]:font-bold [&_h2]:leading-tight [&_h2]:text-[#7A3EF2] [&_h2]:mt-10 [&_h2]:mb-5 [&_h2]:text-left [&_h3]:text-xl [&_h3]:md:text-2xl [&_h3]:font-bold [&_h3]:text-[#7A3EF2] [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:border-l-4 [&_h3]:border-[#7A3EF2] [&_h3]:pl-4 [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:text-gray-900 [&_h4]:mt-6 [&_h4]:mb-2 [&_p]:text-left md:[&_p]:text-justify [&_p]:mb-4 [&_a]:text-blue-600 [&_a]:font-semibold [&_a]:underline [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2 [&_li]:leading-relaxed [&_li_p]:inline [&_li]:text-left md:[&_li]:text-justify [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic [&_u]:underline [&_table]:w-full [&_table]:border-collapse [&_table]:my-6 [&_th]:bg-[#7A3EF2] [&_th]:text-white [&_th_*]:text-white [&_th]:font-semibold [&_th]:border [&_th]:border-[#7A3EF2] [&_th]:p-3 [&_td]:border [&_td]:border-gray-200 [&_td]:p-3";
+  "cms-rich-text max-w-full min-w-0 break-words text-gray-800 text-sm md:text-base leading-relaxed space-y-4 [&_h2]:border-l-4 [&_h2]:border-[#7A3EF2] [&_h2]:pl-4 [&_h2]:text-2xl [&_h2]:md:text-4xl [&_h2]:font-bold [&_h2]:leading-tight [&_h2]:text-[#7A3EF2] [&_h2]:mt-10 [&_h2]:mb-5 [&_h2]:text-left [&_h3]:text-xl [&_h3]:md:text-2xl [&_h3]:font-bold [&_h3]:text-[#7A3EF2] [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:border-l-4 [&_h3]:border-[#7A3EF2] [&_h3]:pl-4 [&_h4]:text-lg [&_h4]:font-semibold [&_h4]:text-gray-900 [&_h4]:mt-6 [&_h4]:mb-2 [&_p]:text-left md:[&_p]:text-justify [&_p]:mb-4 [&_a]:text-blue-600 [&_a]:font-semibold [&_a]:underline [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-2 [&_li]:leading-relaxed [&_li_p]:inline [&_li]:text-left md:[&_li]:text-justify [&_strong]:font-bold [&_b]:font-bold [&_em]:italic [&_i]:italic [&_u]:underline [&_table]:w-full [&_table]:border-collapse [&_table]:my-6 [&_th]:bg-[#7A3EF2] [&_th]:text-white [&_th_*]:text-white [&_th]:font-semibold [&_th]:border [&_th]:border-[#7A3EF2] [&_th]:p-3 [&_td]:border [&_td]:border-gray-200 [&_td]:p-3";
 
 function hasInlineFormatting(html = "") {
   return /<(strong|b|em|i|u|s|strike|mark)\b/i.test(String(html));
@@ -77,25 +78,12 @@ function shouldUseRichTextWrapper(html = "") {
   return hasBlockHtml(value) || hasInlineFormatting(value);
 }
 
-function stripCmsHighlightArtifacts(html = "") {
-  return String(html || "")
-    .replace(/<\/?mark\b[^>]*>/gi, "")
-    .replace(/\sstyle=(["'])((?:(?!\1).)*background-color\s*:[^"']*)((?:(?!\1).)*)\1/gi, (_match, quote, before, after) => {
-      const nextStyle = `${before}${after}`
-        .replace(/background-color\s*:\s*[^;]+;?/gi, "")
-        .replace(/;;+/g, ";")
-        .trim();
-      return nextStyle ? ` style=${quote}${nextStyle}${quote}` : "";
-    });
-}
-
 // Remove CMS artefacts that inflate mobile layout (empty <p>, unwrapped wide tables).
 function normalizeCmsHtml(html = "") {
-  let value = stripCmsHighlightArtifacts(html).trim();
+  let value = normalizeCmsBodyHtml(html).trim();
   if (!value) return "";
 
   value = value.replace(/<p>(?:\s|&nbsp;|&#160;|<br\s*\/?>)*<\/p>/gi, "");
-  value = dedupeConsecutiveCmsParagraphs(value);
   value = value.replace(/<table\b[\s\S]*?<\/table>/gi, (table) => {
     if (/<th\b/i.test(table)) return table;
     return table.replace(/<tr\b[^>]*>[\s\S]*?<\/tr>/i, (firstRow) =>
@@ -431,21 +419,6 @@ function stripHtml(value = "") {
 
 function contentFingerprint(html = "") {
   return stripHtml(html).replace(/\s+/g, " ").trim().toLowerCase();
-}
-
-function dedupeConsecutiveCmsParagraphs(html = "") {
-  let paragraphFingerprints = new Set();
-  return String(html || "").replace(/<h[1-6]\b[\s\S]*?<\/h[1-6]>|<p\b[\s\S]*?<\/p>/gi, (node) => {
-    if (/^<h[1-6]\b/i.test(node)) {
-      paragraphFingerprints = new Set();
-      return node;
-    }
-
-    const fingerprint = contentFingerprint(node);
-    if (fingerprint && paragraphFingerprints.has(fingerprint)) return "";
-    if (fingerprint) paragraphFingerprints.add(fingerprint);
-    return node;
-  });
 }
 
 // CRM often duplicates the same copy in introParagraph + body (and embeds <table> HTML
@@ -1052,68 +1025,21 @@ function createHeadingIcon(heading = "") {
   return svg;
 }
 
-function applyHeadingIconSizing(svg) {
-  if (!svg) return;
-  svg.dataset.cmsHeadingIcon = "true";
-  svg.setAttribute("width", "32");
-  svg.setAttribute("height", "32");
-  svg.classList.remove(
-    "inline",
-    "inline-block",
-    "shrink-0",
-    "mr-2",
-    "mt-0.5",
-    "h-[1em]",
-    "w-[1em]",
-    "align-[-0.125em]"
-  );
-  // Same absolute positioning as createHeadingIcon — see comment there.
-  svg.classList.add(
-    "absolute",
-    "left-0",
-    "top-1/2",
-    "-translate-y-1/2",
-    "h-10",
-    "w-10",
-    "md:h-12",
-    "md:w-12",
-    "text-[#7A3EF2]"
-  );
-}
-
-function ensureHeadingIcon(headingEl, heading = "") {
+// Headings get their accent from CSS ([&_h2]:border-l-4 in CMS_RICH_TEXT_CLASS)
+// now, not an injected icon — this just hides section shells CRM left titleless
+// and cleans up any icon a previously-open tab injected before this changed.
+function normalizeCmsH2Heading(headingEl) {
   if (!headingEl || /^H1$/i.test(headingEl.tagName)) return;
 
-  // Lead/contact forms — never inject section icons (home hero uses <main> as main column).
-  if (headingEl.closest("[data-cms-skip-heading-icon='true']")) {
-    headingEl.querySelectorAll("svg[data-cms-heading-icon='true']").forEach((node) => node.remove());
-    return;
-  }
+  headingEl.querySelectorAll("svg[data-cms-heading-icon='true']").forEach((node) => node.remove());
 
-  const label = getHeadingLabel(headingEl);
+  // Lead/contact forms never had heading icons (home hero uses <main> as main column).
+  if (headingEl.closest("[data-cms-skip-heading-icon='true']")) return;
+
   // Section wrappers without title render an empty h2; child components (e.g. fee calculators) supply their own.
-  if (!label) {
+  if (!getHeadingLabel(headingEl)) {
     headingEl.style.display = "none";
-    return;
   }
-
-  const iconHeading = heading || label;
-  const nextPath = iconSvgPathForHeading(iconHeading);
-  let existingSvg = headingEl.querySelector("svg[data-cms-heading-icon='true']");
-
-  if (!existingSvg) {
-    // React-icons use fill paths — replacing only `d` leaves invisible icons on published pages.
-    headingEl.querySelectorAll(":scope > svg, :scope > i").forEach((node) => node.remove());
-    existingSvg = createHeadingIcon(iconHeading);
-    headingEl.insertBefore(existingSvg, headingEl.firstChild);
-    return;
-  }
-
-  const path = existingSvg.querySelector("path");
-  if (path && path.getAttribute("d") !== nextPath) {
-    path.setAttribute("d", nextPath);
-  }
-  applyHeadingIconSizing(existingSvg);
 }
 
 function setHeading(sectionEl, heading) {
@@ -1534,6 +1460,17 @@ function syncUnifiedStructuredTables(bodyElement, page) {
 
   buildSectionOrder(page).forEach((key) => {
     const section = getSectionData(page, key);
+
+    // This injection exists only for fee/pricing sections, where a separate
+    // structured table is more trustworthy than the merged body's own HTML.
+    // Other CMS fields (e.g. documentsRequired) can carry a stale table in
+    // their own `nestedSections` — left over from an older CMS format, with
+    // generic auto-generated column names — and findUnifiedStructuredTableHeading's
+    // exact-heading match would otherwise wrongly swap it in for the correct,
+    // already-rendered contentBody table whenever the section's own heading
+    // happens to match a heading actually present in the unified body.
+    if (!/fee|fees|pricing|price|cost|charge/i.test(`${key} ${contentHeading(section, "")}`)) return;
+
     const headingEl = findUnifiedStructuredTableHeading(bodyElement, key, section);
 
     const structuredTables = cmsStructuredTablesForSection(section);
@@ -2322,7 +2259,7 @@ export default function FactoryCmsDomSync({ page, landingSlug, staticPageKey }) 
       // }
       syncConnectedServices(activePage);
       mainColumn?.querySelectorAll("h2").forEach((headingEl) => {
-        ensureHeadingIcon(headingEl, getHeadingLabel(headingEl));
+        normalizeCmsH2Heading(headingEl);
       });
       normalizeMainColumnTextAlign(mainColumn);
       normalizeAllCmsTables(mainColumn);

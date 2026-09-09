@@ -215,8 +215,20 @@ function stripCmsBodyTags(value = "") {
 // CRM sometimes repeats a paragraph across the unified body — drop exact repeats
 // within the same heading section (a new heading resets the dedupe window).
 export function normalizeCmsBodyHtml(html = "") {
+  const source = promoteCmsBodyTableHeaderCells(stripCmsBodyHighlightArtifacts(html));
+
+  // Tables must not go through the dedupe pass below: two rows legitimately
+  // sharing the same short value (e.g. EPFO and ESIC both costing "INR 2,999
+  // onwards") look identical to the copy-paste duplication the dedupe is meant
+  // to catch, and it was blanking the second cell — showing as "As Applicable".
+  const tables = [];
+  const withTablesExtracted = source.replace(/<table\b[\s\S]*?<\/table>/gi, (table) => {
+    tables.push(table);
+    return ` CMS_TABLE_${tables.length - 1} `;
+  });
+
   let paragraphFingerprints = new Set();
-  return promoteCmsBodyTableHeaderCells(stripCmsBodyHighlightArtifacts(html)).replace(
+  const deduped = withTablesExtracted.replace(
     /<h[1-6]\b[\s\S]*?<\/h[1-6]>|<p\b[\s\S]*?<\/p>/gi,
     (node) => {
       if (/^<h[1-6]\b/i.test(node)) {
@@ -230,6 +242,8 @@ export function normalizeCmsBodyHtml(html = "") {
       return node;
     }
   );
+
+  return deduped.replace(/ CMS_TABLE_(\d+) /g, (_match, index) => tables[Number(index)]);
 }
 
 // CMS breadcrumb trail (content.breadcrumbs / page.breadcrumbs) for server-side
