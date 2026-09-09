@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { getCmsRedirectDestination } from "@/lib/cms";
+
+const CMS_REDIRECT_WEBSITE = "factorylicence.in";
 
 function nextWithPathname(request) {
   const requestHeaders = new Headers(request.headers);
@@ -6,34 +9,42 @@ function nextWithPathname(request) {
   return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
-export function proxy(request) {
+export async function proxy(request) {
   const url = request.nextUrl.clone();
   const host = request.headers.get("host");
+  const path = url.pathname;
+  const isLocalDev =
+    host &&
+    (host.includes("localhost") ||
+     host.includes("127.0.0.1") ||
+     host.includes(":3000"));
 
-  // Skip redirects for local development (localhost, 127.0.0.1, or any port-based local URL)
-  if (
-    host && 
-    (host.includes("localhost") || 
-     host.includes("127.0.0.1") || 
-     host.includes(":3000"))
-  ) {
-    return nextWithPathname(request);
-  }
-
-  // 1. WWW to Non-WWW Redirect
-  if (host && host.startsWith("www.")) {
+  // 1. WWW to Non-WWW Redirect (production only)
+  if (!isLocalDev && host && host.startsWith("www.")) {
     url.hostname = host.replace("www.", "");
     url.port = ""; // Explicitly remove dev ports (like :3000) if they leaked in
     url.protocol = "https:"; // Enforce production HTTPS
     return NextResponse.redirect(url, 301);
   }
 
-  // 2. HTTP to HTTPS enforcement
+  // 2. HTTP to HTTPS enforcement (production only)
   const proto = request.headers.get("x-forwarded-proto");
-  if (proto === "http") {
+  if (!isLocalDev && proto === "http") {
     url.protocol = "https:";
     url.port = ""; // Ensure standard HTTPS port
     return NextResponse.redirect(url, 301);
+  }
+
+  // 3. CMS-managed 301 redirect (SEO "Redirect URLs" field, e.g. after a
+  // slug rename). Content-level like the check should be, so it also runs
+  // locally, unlike the host/protocol normalization above. Fails open on
+  // any CMS error/timeout. Skipped for asset-looking paths (a literal file
+  // extension) — page slugs never look like this.
+  if (!/\.[a-zA-Z0-9]+$/.test(path)) {
+    const cmsDestination = await getCmsRedirectDestination(CMS_REDIRECT_WEBSITE, path);
+    if (cmsDestination) {
+      return NextResponse.redirect(new URL(cmsDestination, request.url), { status: 301 });
+    }
   }
 
   return nextWithPathname(request);

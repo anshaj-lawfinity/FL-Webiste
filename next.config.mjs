@@ -139,16 +139,19 @@ const additionalBlogRedirects = [
 const nextConfig = {
   //      output: "export",
   //   trailingSlash: true,
-  // Non-JS crawlers (SEO audit tools) need blocking metadata so <title>/canonical/
-  // robots land in <head> on the raw HTML instead of Next's streamed-then-relocated
-  // tags. Next already blocks streaming by default for Googlebot, Bingbot, social
-  // preview bots and Lighthouse (see next/dist/shared/lib/router/utils/html-bots) —
-  // this only *adds* generic SEO crawlers (e.g. Screaming Frog) that aren't in that
-  // default list. Matching everything here (e.g. `/.*/`) would also block streaming
-  // for real mobile visitors, forcing every request to wait on the CMS fetch before
-  // any HTML is sent — directly hurting TTFB/LCP, so keep this scoped to bots only.
-  htmlLimitedBots:
-    /[\w-]+-Google|Google-[\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight|Screaming Frog|AhrefsBot|SemrushBot|MJ12bot|DotBot/i,
+  // Every CMS-driven route's generateMetadata() is async (it fetches the SEO
+  // fields from the CRM). Next's default "streaming metadata" optimization
+  // sends the HTML shell before that fetch resolves and patches title/
+  // description/canonical into <head> client-side afterwards for any
+  // user agent it doesn't recognize as a non-JS bot — so plain curl and even
+  // view-source in a real browser (which never runs that patch script) see
+  // the tags missing from <head> entirely, landing instead wherever the
+  // patch script itself sits in the body. Matching every request here (not
+  // just known crawler UAs) forces Next to always wait for CMS metadata and
+  // render it directly into <head> on the very first response, for everyone.
+  // This trades a little TTFB for metadata that is correct in the raw HTML
+  // for 100% of requests — required for this project's SEO requirements.
+  htmlLimitedBots: /.*/,
   images: {
     unoptimized: true,
   },

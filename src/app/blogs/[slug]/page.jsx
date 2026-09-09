@@ -66,7 +66,19 @@ export async function generateMetadata({ params }) {
       title: rewrittenBlog.metaTitle || rewrittenBlog.title || 'Blog',
       description: rewrittenBlog.metaDescription || '',
       url: canonical,
+      type: 'article',
+      siteName: 'Lawfinity',
       images: rewrittenBlog.image ? [{ url: rewrittenBlog.image }] : undefined,
+    },
+    // Same fields BlogsClientUI used to render via a client-side next/head <Head>
+    // block (invalid in the App Router — it doesn't hoist into the real <head>,
+    // which was the actual cause of these tags showing up outside <head>/as stray
+    // body markup). Moved here so they're part of the real server-rendered <head>.
+    twitter: {
+      card: 'summary_large_image',
+      title: rewrittenBlog.metaTitle || rewrittenBlog.title || 'Blog',
+      description: rewrittenBlog.metaDescription || '',
+      images: rewrittenBlog.image ? [rewrittenBlog.image] : undefined,
     },
     // CRM's noIndex/noFollow must reach the live <meta name="robots"> tag —
     // previously hardcoded to index/follow regardless of what CRM set.

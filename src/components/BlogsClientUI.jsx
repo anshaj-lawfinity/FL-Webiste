@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Head from "next/head";
 import { FaPlus, FaMinus } from "react-icons/fa";
 // (Optional) Keep the renderer import if you still want it as a fallback.
 // import EditorJsRenderer from "./EditorJsRenderer";
@@ -626,24 +625,6 @@ export default function BlogsClientUI({ blog }) {
 
   return (
     <div className="min-h-screen text-justify md:mt-20 mt-20">
-      <Head>
-        <title>{blog.metaTitle}</title>
-        <meta name="description" content={blog.metaDescription} />
-        <meta property="og:title" content={blog.metaTitle} />
-        <meta property="og:description" content={blog.metaDescription} />
-        <meta property="og:image" content={blog.image} />
-        <meta
-          property="og:url"
-          content={`https://internal.lawfinity.in/blog/${blog.urlSlug}`}
-        />
-        <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="Lawfinity" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={blog.metaTitle} />
-        <meta name="twitter:description" content={blog.metaDescription} />
-        <meta name="twitter:image" content={blog.image} />
-      </Head>
-
       {/* Hero Section */}
       <section className="relative w-full max-w-7xl mx-auto overflow-hidden">
         {/* 16:9 box */}

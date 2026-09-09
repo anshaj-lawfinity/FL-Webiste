@@ -1,11 +1,10 @@
 "use client";
-import { useEffect } from "react";
 
+// No document.title override here — the route's generateMetadata() already
+// sets the real (CMS-driven, with fallback) <title> server-side. This is
+// only the Suspense fallback / no-CMS-data UI (see src/app/privacy-policy/page.jsx),
+// so overwriting the title client-side would just clobber the correct one.
 export default function PrivacyPolicyPage() {
-    useEffect(() => {
-        document.title = "Privacy Policy";
-    }, []);
-
     return (
         <div className="mt-20">
             <div>

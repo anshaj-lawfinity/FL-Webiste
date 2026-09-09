@@ -46,6 +46,32 @@ async function fetchCms(path, { fresh = false, revalidate = CMS_REVALIDATE_SECON
   }
 }
 
+/**
+ * Look up a CMS-configured permanent redirect for an exact path (set by SEO
+ * users via the "Redirect URLs" field in the CMS's Advanced SEO section).
+ * Returns the destination path, or null if none configured. Fails open —
+ * used from middleware, where a slow/unreachable CMS must never block a
+ * page from rendering. Not wrapped in cache() (no per-render reuse in
+ * middleware, unlike the Server Component fetches above).
+ */
+export async function getCmsRedirectDestination(website, path) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  try {
+    const res = await fetch(
+      `${CMS_BASE_URL}/api/public/redirects?website=${encodeURIComponent(website)}&path=${encodeURIComponent(path)}`,
+      { cache: "no-store", signal: controller.signal },
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.success && data?.redirect?.toPath ? data.redirect.toPath : null;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 // Dedupe CMS fetches within the same request (generateMetadata + page component share one call).
 export const getFactoryCmsLandingPage = cache(async (slug) => {
   return fetchCms(`/api/public/factorylicence/landing-pages/${slug}`);
