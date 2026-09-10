@@ -40,10 +40,18 @@ export async function proxy(request) {
   // locally, unlike the host/protocol normalization above. Fails open on
   // any CMS error/timeout. Skipped for asset-looking paths (a literal file
   // extension) — page slugs never look like this.
+  //
+  // The site root ("/") is a valid source too, so a CMS redirect entered as
+  // "https://factorylicence.in/" moves the home page as well. Note this means
+  // a root row makes the home page itself 301 away, so it is only ever set
+  // deliberately from the CMS.
   if (!/\.[a-zA-Z0-9]+$/.test(path)) {
     const cmsDestination = await getCmsRedirectDestination(CMS_REDIRECT_WEBSITE, path);
-    if (cmsDestination) {
-      return NextResponse.redirect(new URL(cmsDestination, request.url), { status: 301 });
+    const destination = cmsDestination ? new URL(cmsDestination, request.url) : null;
+    // Ignore a destination that resolves back to the path being requested —
+    // honouring it would be an infinite redirect loop.
+    if (destination && destination.pathname !== path) {
+      return NextResponse.redirect(destination, { status: 301 });
     }
   }
 
