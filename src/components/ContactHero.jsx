@@ -43,7 +43,7 @@ export default function ContactUs() {
                 Uttar Pradesh 201309
               </p>
               <p className="text-sm mt-2">
-                <span className="font-medium"></span> +91 93111 17064
+                <span className="font-medium"></span> +91 99107 92080
               </p>
             </div>
 
@@ -54,7 +54,7 @@ export default function ContactUs() {
                 GLS Avenue 51. Sector 92 Gurgaon 122505.
               </p>
               <p className="text-sm mt-2">
-                <span className="font-medium"></span> +91 95400 34687
+                <span className="font-medium"></span> +91 87961 02747
               </p>
             </div>
 
