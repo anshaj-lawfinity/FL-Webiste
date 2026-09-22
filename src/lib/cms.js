@@ -328,6 +328,7 @@ const RESERVED_MARQUEE_SLUGS = new Set([
   "privacy-policy",
   "terms-conditions",
   "refund-cancellation",
+  "disclaimer",
   "payments",
   "api",
 ]);

@@ -216,6 +216,11 @@ export default async function sitemap() {
       priority: 0.3,
       cms: { type: "static", key: "refund-cancellation" },
     }),
+    toSitemapEntry("/disclaimer", {
+      changeFrequency: "yearly",
+      priority: 0.3,
+      cms: { type: "static", key: "disclaimer" },
+    }),
     toSitemapEntry("/payments", {
       priority: 0.5,
       cms: { type: "static", key: "payments" },

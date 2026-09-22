@@ -37,6 +37,7 @@ export default function Footer() {
     { href: "/privacy-policy", label: "Privacy Policy" },
     { href: "/refund-cancellation", label: "Refund Cancellation" },
     { href: "/terms-conditions", label: "Terms Conditions" },
+    { href: "/disclaimer", label: "Disclaimer" },
   ];
 
   return (
