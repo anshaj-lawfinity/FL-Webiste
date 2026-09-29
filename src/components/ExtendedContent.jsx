@@ -96,7 +96,7 @@ const ExtendedContent = () => {
                                     As mentioned in the Factories Act, 1948, anyone operating a manufacturing facility will face legal action. This simply makes the Factory licence registration a compulsory document to have. Factories running without registration can face legal issues like imposing heavy fines, penalties, and even lead to imprisonment.
                                 </li>
                                 <li className="flex items-start gap-3 text-sm">
-                                    The government is pressuring Factories to obtain a legal licence because having a factory licence registration ensures that the factory is running with all the appropriate safety standards. Moreover, depending on the nature of the operations and occupancy that the premises take, your business might also need to obtain a fire licence certificate as a part of the overall regulatory compliance framework. So that the employees&apos; health and well-being will not be compromised. Not only this, but the licence also validates the operational authenticity of the business, which makes other approvals, participation in government tenders, and licences easy to secure.
+                                    The government is pressuring Factories to obtain a legal licence because having a factory licence registration ensures that the factory is running with all the appropriate safety standards. Moreover, depending on the nature of the operations and occupancy that the premises take, your business might also need to obtain a fire occupancy permit certificate as a part of the overall regulatory compliance framework. So that the employees&apos; health and well-being will not be compromised. Not only this, but the licence also validates the operational authenticity of the business, which makes other approvals, participation in government tenders, and licences easy to secure.
                                 </li>
                                 <li className="flex items-start gap-3 text-sm">
                                     All these things make your Factory licence registration a crucial aspect for the factory owners to set up or operate a manufacturing plant in India. An issuance of a manufacturer licence is not just a legal requirement, it also shows that the business works to recognised operational standards. Having a manufacturing license certificate boosts credibility towards investors, customers, suppliers and government bodies, and makes business more hassle-free.
@@ -117,18 +117,18 @@ const ExtendedContent = () => {
                             <h3 className="text-2xl font-semibold text-gray-800">Advantages Of A Factory Licence Registration</h3>
                         </div>
                         <p className="text-sm text-gray-600 mb-6 leading-relaxed">
-                            Obtaining a factory license registration for services like fire clearance certificate online, and industry pollution certificate apply online can be beneficial for the following reasons:
+                            Obtaining a factory license registration with approved fire and pollution permits can be beneficial for the following reasons:
                         </p>
                         <div className="space-y-6">
                             {[
                                 {
                                     title: "Legal Recognition & Protection",
-                                    desc: "A legal licence for a factory is the symbol that your factory has been recognised by the law, and this symbol will give your factory protection from legal complications and shutdowns due to non-compliance.Other approvals like a fire safety clearance certificate and factory pollution certificate apply online can improve the compliance record and operational integrity of the factory.",
+                                    desc: "A legal licence for a factory is a symbol that your factory has been recognised by the law, and this will give your factory protection from legal complications and shutdowns due to non-compliance. Other approvals like a pollution certification can improve the compliance record and operational integrity of the factory.",
                                     icon: Landmark
                                 },
                                 {
                                     title: "Ensure Safety & Welfare at Workplace",
-                                    desc: "The licence minimises accidents by mandating to follow-up of all the safety standards and employee welfare regulations, which improves the satisfaction of employees. Moreover, regular compliance activities, that includes the renewal of fire safety certificate online, the government is pressuring Factories to obtain a legal licence because having a registration for your factory ensures that the factory is running smoothly, which can help your factories maintain safety standards and operational continuity. On the other hand, factories should also conduct routine fire safety checks and renew fire extinguisher equipment as per the prescribed maintenance schedule to ensure better safety.",
+                                    desc: "The licence minimises accidents by mandating to follow-up of all the safety standards and employee welfare regulations, which improves the satisfaction of employees. Moreover, regular compliance activities, that includes the renewal of fire approval online, the government is pressuring Factories to obtain a legal licence because having a registration for your factory ensures that the factory is running smoothly, which can help your factories maintain safety standards and operational continuity. On the other hand, factories should also conduct routine fire safety checks and recheck their fire extinguisher equipment as per the prescribed maintenance schedule to ensure better safety.",
                                     icon: HardHat
                                 },
                                 {
@@ -138,7 +138,7 @@ const ExtendedContent = () => {
                                 },
                                 {
                                     title: "Access to Government Schemes",
-                                    desc: "Government schemes, subsidies, and certification will only be used by the factories that are recognised by the government authorities. However, many united from the numerous industries also need to have a fire safety license and other types of statutory approvals to meet the sector-specific compliance requirements.",
+                                    desc: "Government schemes, subsidies, and certification will only be used by the factories that are recognised by the government authorities. However, many united from the numerous industries also need to have a fire safety permit and other types of statutory approvals to meet the sector-specific compliance requirements.",
                                     icon: CheckCircle2
                                 },
                                 {
@@ -185,7 +185,7 @@ const ExtendedContent = () => {
                             "Public or private sector enterprises that fall under the definition of a \"factory\" in the Factories Act, 1948.",
                             "Industrial warehouses use machinery for processing, altering, repackaging, or handling goods.",
                             "Export-Oriented Units (EOUs) are involved in any manufacturing activity.",
-                            "Entities that require pollution control or fire safety certificate clearance due to operational risks are also subject to stricter regulatory oversight. Such establishments are often required to obtain a fire safety NOC before commencing operations or applying for certain regulatory approvals."
+                            "Entities that require pollution control or fire NOC clearance due to operational risks are also subject to stricter regulatory oversight. Such establishments are often required to obtain a fire permit before commencing operations or applying for certain regulatory approvals."
                         ].map((point, idx) => (
                             <div key={idx} className="flex gap-4 items-start py-2 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors px-2 rounded-lg">
                                 <div className="mt-1 bg-green-100 text-green-600 rounded-full p-0.5">
@@ -198,7 +198,7 @@ const ExtendedContent = () => {
 
                     <div className="mt-12 p-6 bg-purple-50 rounded-2xl border border-purple-100 text-center">
                         <p className="text-gray-700 font-medium">
-                            We can assist you with online registration of your factory in India. And also provide help in getting <InternalLink className="text-blue-500 underline" href="/pollution-noc-in-delhi">pollution noc certificate in Delhi</InternalLink>, <InternalLink className="text-blue-500 underline" href="/pollution-noc-in-haryana">Pollution NOC in Haryana</InternalLink>, and <InternalLink className="text-blue-500 underline" href="/pollution-noc-in-uttar-pradesh">Pollution NOC in Uttar Pradesh</InternalLink>. We also assisst in hospital pollution certificate online for your medical establishment.
+                            We can assist you with online registration of your factory in India. And also provide help in getting <InternalLink className="text-blue-500 underline" href="/pollution-noc-in-delhi">pollution clearances in Delhi</InternalLink>, <InternalLink className="text-blue-500 underline" href="/pollution-noc-in-haryana">Pollution NOC in Haryana</InternalLink>, and <InternalLink className="text-blue-500 underline" href="/pollution-noc-in-uttar-pradesh">Pollution NOC in Uttar Pradesh</InternalLink>.
                         </p>
                     </div>
                 </div>
@@ -214,7 +214,7 @@ const ExtendedContent = () => {
 
                     <div className="max-w-4xl space-y-4 mb-12">
                         <p className="text-sm text-gray-600 leading-relaxed font-sans italic">
-                            In case you have this question hovering over your mind, like &quot;what documents required for fire noc&quot;, or any other service that you want to avail for. At first, you need to know that, documentation is the most crucial part of the Factory registration process. If you miss or submit any wrong documents, then your factory license application process will take more than usual because of the delay due to the wrong or missing documents.
+                            In case you have this question hovering over your mind, like &quot;what are the required documents for a fire NOC&quot;, or any other service that you want to avail for. At first, you need to know that, documentation is the most crucial part of the Factory registration process. If you miss or submit any wrong documents, then your factory license application process will take more than usual because of the delay due to the wrong or missing documents.
                         </p>
                         <p className="text-sm text-gray-600 leading-relaxed font-sans italic">
                         Having prior knowledge of what are the documents required for factory  license can enhance approvals time. A common query of business owners is, what exactly documents are needed for a factory licence application? While the requirements may differ from state to state, these are some documents that are typically needed throughout India.
@@ -248,7 +248,7 @@ const ExtendedContent = () => {
                     </div>
 
                     <p className="text-sm text-gray-600 leading-relaxed font-medium mt-6 mb-6">
-                        Note: Depending on the size and nature of operations, a fire NOC certificate may also be required before the application can be processed by the concerned authorities.
+                        Note: Depending on the size and nature of operations, a fire approval may also be required before the application can be processed by the concerned authorities.
                     </p>
 
                     <div className="mt-6 p-8 bg-gray-900 rounded-2xl text-white text-center">
@@ -328,7 +328,7 @@ const ExtendedContent = () => {
 
                         <div className="mt-10 pt-8 border-t border-purple-400/30">
                             <p className="text-center text-sm md:text-base font-medium">
-                                Are you also looking for the fire noc license, such as <InternalLink className="text-blue-500 underline" href="/fire-noc-in-delhi">Fire NOC Delhi</InternalLink>, <InternalLink className="text-blue-500 underline" href="/fire-noc-in-haryana">Fire NOC in Haryana</InternalLink>, <InternalLink className="text-blue-500 underline" href="/fire-noc-in-uttar-pradesh">Fire NOC Uttar Pradesh</InternalLink>? If yes, then register your query now and make your fire noc online application process easy!
+                                Are you also looking for the state-wise services, such as <InternalLink className="text-blue-500 underline" href="/fire-noc-in-delhi">Fire NOC Delhi</InternalLink>, <InternalLink className="text-blue-500 underline" href="/fire-noc-in-haryana">Fire NOC in Haryana</InternalLink>, <InternalLink className="text-blue-500 underline" href="/fire-noc-in-uttar-pradesh">Fire NOC Uttar Pradesh</InternalLink>? If yes, then register your query now and make your application process easy!
                             </p>
                         </div>
                     </div>
@@ -401,7 +401,7 @@ const ExtendedContent = () => {
                                 ))}
                             </ul>
                             <p className="text-sm text-red-800 mt-4 font-sans italic leading-relaxed">
-                                Note: You need to make sure that you need timely renewal of fire safety certificate online, when and wherever required. This would help you to meet with the compliance issues and delays that might come up related to regulatory approvals.
+                                Note: You need to make sure that you need timely renewal of fire no objection certificate online, when and wherever required. This would help you to meet with the compliance issues and delays that might come up related to regulatory approvals.
                             </p>
                         </div>
 
@@ -441,7 +441,7 @@ const ExtendedContent = () => {
                         <div className="space-y-6">
                             <h4 className="text-xl font-semibold text-gray-800 border-b pb-2">Renewal fee</h4>
                             <p className="text-sm text-gray-600 font-sans italic">
-                                The renewal fees for pollution certificate process and the related certification such as the fire certificate renewal fee is calculated as per the structure provided below:
+                                The renewal fees for pollution clearance and the related certification is calculated as per the structure provided below:
                             </p>
                             <div className="space-y-4">
                                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:shadow-sm transition-shadow">
@@ -456,7 +456,7 @@ const ExtendedContent = () => {
                                 </div>
                                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:shadow-sm transition-shadow">
                                     <p className="font-semibold text-gray-800 mb-2">After April (up to year-end):</p>
-                                    <p className="text-sm text-gray-600 font-sans italic">• Same as above plus for fire licence renewal or any related registration: Late fee = INR 150 (for first 3 months) + 5% of license fee per additional month</p>
+                                    <p className="text-sm text-gray-600 font-sans italic">• Same as above plus for any related registration: Late fee = INR 150 (for first 3 months) + 5% of license fee per additional month</p>
                                 </div>
                                 <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 hover:shadow-sm transition-shadow">
                                     <p className="font-semibold text-gray-800 mb-2">Beyond one year:</p>
@@ -552,7 +552,7 @@ const ExtendedContent = () => {
                         </div>
 
                         <p className="text-gray-700 font-medium border-l-4 border-[#7c4bdf] pl-4">
-                            It is a legal prerequisite before any production can commence. In most of the cases, a fire NOC certificate is also a requirement for the approval process before the certificate for factory license is issued, which makes it up for a full compliance.
+                            It is a legal prerequisite before any production can commence. In most of the cases, a fire no-objection certificate is also a requirement for the approval process before the certificate for factory license is issued, which makes it up for a full compliance.
                         </p>
                     </div>
                 </div>
@@ -568,10 +568,10 @@ const ExtendedContent = () => {
 
                     <div className="max-w-4xl space-y-6 mb-10">
                         <p className="text-gray-300 leading-relaxed text-lg">
-                            The factory licence registration process and the pollution apply online may seem easy, but a single mistake can cause a delay in the process, which will be a waste of time. To save any possible rejection, you will need a professional factory license consultant who will guide you throughout the process. If you are searching for factory licence consultants near me, our team provides complete end-to-end assistance for approvals, documentation, and compliance.
+                            The factory licence and pollution registration process may seem easy, but a single mistake can cause a delay in the process, which will be a waste of time. To save any possible rejection, you will need a professional factory license consultant who will guide you throughout the process. If you are searching for factory licence consultants near me, our team provides complete end-to-end assistance for approvals, documentation, and compliance.
                         </p>
                         <p className="text-gray-300 leading-relaxed">
-                            Other than the factory NOCs, we also render our services to businesses and other organizations in providing them with specific NOCs related to fire safety, which include fire noc for residential buildings, fire NOC for hospitals, fire noc for commercial buildings, and fire NOC for clinics.
+                            Other than the factory NOCs, we also render our services to businesses and other organizations in providing them with specific NOCs related to fire safety, which include residential buildings, hospitals, commercial buildings, clinics, and many more.
                         </p>
                         <p className="text-gray-300 leading-relaxed">
                             We have a team of expert legal advisors who will provide you with comprehensive support for factory act licence renewal, ensuring your factory remains fully compliant with state regulations without interruptions.

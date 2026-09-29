@@ -5,7 +5,7 @@ export default function AssistanceSection() {
     {
       title: "Zero-Error Documentation",
       description:
-        "100% accuracy in paperwork to avoid delays, rejections, or penalties while you apply for fire safety certificate.",
+        "100% accuracy in paperwork to avoid delays, rejections, or penalties while you apply for a fire No objection certificate.",
       image: SEO_ASSETS.factoryLicenceRenewal,
       alt: "Factory Licence Renewal",
     },
@@ -19,7 +19,7 @@ export default function AssistanceSection() {
     {
       title: "Support 24/7",
       description:
-        "We help diagnose processes in the company regarding the type of registration or license that you might need, say, a pollution certificate for industry. We provide recommendations on process optimization and help you out with solutions instantly.",
+        "We help diagnose processes in the company regarding the type of registration or license that you might need. We provide recommendations on process optimization and help you out with solutions instantly.",
       image: SEO_ASSETS.factoryActConsultants,
       alt: "Factory Act Consultants",
     },

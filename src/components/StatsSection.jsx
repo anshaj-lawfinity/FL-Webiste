@@ -47,7 +47,7 @@ export default function StatsSection() {
           Numbers don’t lie – we’re growing fast!
         </h2>
         <p className="text-center text-gray-600 text-sm max-w-4xl mx-auto mb-10 text-justify">
-          Our clients fully rely on our help in all aspects of their compliance needs, including their fire safety renewal online. We have a team of legal experts who answer your queries to questions such as how to get pollution certificate for factory, pollution certificate for business so that you can set up your manufacturing unit with full knowledge regarding the things that you must know as a business person.
+          Our clients fully rely on our help in all aspects of their compliance needs, including their fire safety renewal online. We have a team of legal experts who answer your queries to questions so that you can set up your manufacturing unit with full knowledge regarding the things that you must know as a business person.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 font-medium">
           <StatCard label="Factories Registered" value={counts.clicks} icon={<TbLicense size={28} />} />

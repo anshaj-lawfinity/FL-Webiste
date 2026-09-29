@@ -23,7 +23,7 @@ const PARAGRAPHS = [
     a comprehensive review of the layout of the factory, it&apos;s safety measures,
     waste management system and compliance with various rules and regulations. It
     also depends on the nature of the facility, you may also need to complete the
-    online fire safety certificate apply process as part of their overall
+    online fire permit apply process as part of their overall
     regulatory compliance requirements. The licence may need to be renewed every
     year or within a stipulated time as per the requirements of the state. Ignoring
     these requirements shall lead to legal complications including penalties,
