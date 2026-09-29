@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
                             Privacy Policy
                         </h1>
                         <p className="text-base max-w-xl mb-8">
-                            LAWFINITY INDIA PRIVATE LIMITED (popularly known as Lawfinity or LIPL) operates factorylicence.in and may operate other websites. It is the policy of LAWFINITY to respect your privacy regarding any information we might collect while operating our websites.
+                            Factorylicence.in operates factorylicence.in and may operate other websites. It is the policy of Factorylicence.in to respect your privacy regarding any information we might collect while operating our websites.
                         </p>
                     </div>
                 </div>
@@ -47,7 +47,7 @@ export default function PrivacyPolicyPage() {
                             Aggregated Statistics
                         </h3>
                         <p className="text-gray-700 mt-2 text-justify">
-                            LAWFINITY INDIA PRIVATE LIMITED may collect statistics about the behaviour of visitors to its websites. LIPL may display this information publicly or provide it to others. However, LIPL does not disclose personally-identifying information other than as described below.
+                            Factorylicence.in may collect statistics about the behaviour of visitors to its websites. Factorylicence.in may display this information publicly or provide it to others. However, Factorylicence.in does not disclose personally-identifying information other than as described below.
                         </p>
                     </section>
 

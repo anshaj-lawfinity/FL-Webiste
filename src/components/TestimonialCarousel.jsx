@@ -19,7 +19,7 @@ const testimonials = [
     avatar: SEO_ASSETS.clientJaypee,
     alt: 'Factory Licence Apply Online',
     quote:
-      'Pollution NOC ka process initially bahut confusing tha, lekin Lawfinity India ne pura kaam handle kiya—from documentation to approvals. Bohot hi efficient aur trustworthy service.',
+      'Pollution NOC ka process initially bahut confusing tha, lekin Factorylicence.in ne pura kaam handle kiya—from documentation to approvals. Bohot hi efficient aur trustworthy service.',
     others: ['/avatar3.png', '/avatar4.png'],
   },
   {
@@ -55,7 +55,7 @@ const testimonials = [
     avatar: SEO_ASSETS.clientLatherGreenEnergy,
     alt: 'Factory Licence Registrationl',
     quote:
-      'Lawfinity India ke through Pollution NOC lena kaafi asaan ho gaya. Har step par proper guidance mila. Compliance ke bina kaam start karna risk hota hai – unhone woh risk hata diya.',
+      'Factorylicence.in ke through Pollution NOC lena kaafi asaan ho gaya. Har step par proper guidance mila. Compliance ke bina kaam start karna risk hota hai – unhone woh risk hata diya.',
     others: ['/avatar7.png', '/avatar8.png'],
   },
   {
@@ -64,8 +64,8 @@ const testimonials = [
     avatar: SEO_ASSETS.clientSleepyOwlCoffee,
     alt: 'Apply Factory License',
     quote:
-      'Hamari factory ke liye sabhi licences jaise Factory Licence, Pollution NOC, Labour aur Fire Safety approvals ek hi jagah – Lawfinity India – se mile. Ek hi trusted source se saara compliance complete karna bahut hi suvidha janak aur safe tha.',
-    others: ['/avatar8.png', '/avatar1.png'],
+      'Hamari factory ke liye sabhi licences jaise Factory Licence, Pollution NOC, Labour aur Fire Safety approvals ek hi jagah – Factorylicence.in – se mile. Ek hi trusted source se saara compliance complete karna bahut hi suvidha janak aur safe tha.',
+    others: ['/avatar8.png', '/avatar1.png'], 
   },
   {
     name: 'Nawam Gupta',
@@ -73,7 +73,7 @@ const testimonials = [
     avatar: SEO_ASSETS.clientSmcEnterprises,
     alt: 'SMC Enterprises logo - Client testimonial',
     quote:
-      'We obtained all our factory-related licences—such as the Factory Licence, Pollution NOC, Labour Compliance, and Fire Safety Approvals—from a single source: Lawfinity India. Completing all compliances through one trusted partner was extremely convenient and ensured full legal safety.',
+      'We obtained all our factory-related licences—such as the Factory Licence, Pollution NOC, Labour Compliance, and Fire Safety Approvals—from a single source: Factorylicence.in. Completing all compliances through one trusted partner was extremely convenient and ensured full legal safety.',
     others: ['/avatar1.png', '/avatar2.png'],
   },
 ];
