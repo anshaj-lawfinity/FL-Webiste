@@ -177,7 +177,14 @@ body {
   overflow-wrap: normal !important;
 }
 
-.cms-table-scroll th,
+.cms-table-scroll th {
+  min-width: 5.5rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: top;
+}
+
 .cms-table-scroll td {
   min-width: 5.5rem;
   white-space: nowrap;
@@ -204,7 +211,7 @@ body {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
-  table-layout: fixed !important;
+  table-layout: auto !important;
 }
 
 .cms-rich-text .cms-table-scroll table.cms-table-compact th,
@@ -215,6 +222,9 @@ body {
 .cms-table-scroll table.cms-table-compact td {
   white-space: normal !important;
   min-width: 0 !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
 }
 
 /* Fee tables fit content — no forced scrollbar when columns fill the row. */

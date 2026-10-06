@@ -9,8 +9,10 @@ function resolveCmsClientBase() {
   if (process.env.NEXT_PUBLIC_CRM_CMS_BASE_URL) {
     return process.env.NEXT_PUBLIC_CRM_CMS_BASE_URL;
   }
-  if (typeof window !== "undefined" && window.location.hostname === "localhost") {
-    return "http://localhost:3000";
+  // Same-origin `/api/public/*` rewrite (see next.config) — localhost:3003 → CMS
+  // used to hit :3000 cross-origin and fail CORS, so the live page kept a stale table.
+  if (typeof window !== "undefined") {
+    return "";
   }
   return "https://internal.lawfinity.in";
 }
@@ -154,15 +156,20 @@ function applyCmsTableLayoutToTable(table) {
     wrapper.className = "cms-table-scroll max-w-full w-full rounded-xl border border-gray-200";
     table.parentNode?.insertBefore(wrapper, table);
     wrapper.appendChild(table);
+  } else {
+    // Never clip column text — always allow horizontal scroll when headers/cells need width.
+    scrollWrapper.classList.remove("overflow-hidden");
+    scrollWrapper.style.overflowX = "auto";
   }
 
   // CRM HTML tables often ship header cells as the first <tbody> row — promote to <thead>.
   ensureCmsTableHeaderRow(table);
 
+  const rowCellCount = (row) => (row ? row.querySelectorAll("th, td").length : 0);
   const colCount = Math.max(
-    table.querySelectorAll("thead th").length,
-    table.querySelectorAll("tbody tr:first-child td").length,
-    table.querySelectorAll("tr:first-child th, tr:first-child td").length,
+    rowCellCount(table.querySelector("thead tr")),
+    rowCellCount(table.querySelector("tbody tr")),
+    rowCellCount(table.querySelector("tr")),
     1
   );
   // Fee/pricing tables (≤4 cols) fill the column — wide data tables keep horizontal scroll.
@@ -172,12 +179,11 @@ function applyCmsTableLayoutToTable(table) {
   table.classList.add("border-collapse", "text-left", "text-sm");
   if (isCompactTable) {
     table.classList.add("w-full", "cms-table-compact");
-    // Inline !important beats stylesheet max-content rules inside .cms-rich-text.
     table.style.setProperty("width", "100%", "important");
     table.style.setProperty("min-width", "0", "important");
     table.style.setProperty("max-width", "100%", "important");
-    table.style.setProperty("table-layout", "fixed", "important");
-    applyCompactTableColumnWidths(table, colCount);
+    // auto layout keeps long CMS headers (e.g. Professional Fee) visible instead of clipping.
+    table.style.setProperty("table-layout", "auto", "important");
     table.closest(".cms-table-scroll")?.classList.add("cms-table-scroll-compact");
   } else {
     table.classList.add("min-w-[640px]");
@@ -185,7 +191,7 @@ function applyCmsTableLayoutToTable(table) {
     table.style.minWidth = `${minWidthPx}px`;
   }
   table.style.wordBreak = "normal";
-  table.style.overflowWrap = "normal";
+  table.style.overflowWrap = "break-word";
 
   const thead = table.querySelector("thead");
   if (thead) {
@@ -195,10 +201,13 @@ function applyCmsTableLayoutToTable(table) {
   table.querySelectorAll("th, td").forEach((cell) => {
     const isHeader = cell.tagName === "TH" || Boolean(cell.closest("thead"));
     cell.classList.add("p-3", "align-top", "border");
+    cell.style.overflow = "visible";
     if (isHeader) {
       cell.classList.add("font-semibold", "text-left", "border-white/20", "text-white");
       cell.style.backgroundColor = "#7A3EF2";
       cell.style.color = "#ffffff";
+      cell.style.whiteSpace = "normal";
+      cell.style.overflowWrap = "anywhere";
     } else {
       cell.classList.add("border-gray-200", isCompactTable ? "whitespace-normal" : "whitespace-nowrap", "min-w-[5.5rem]");
       // CRM often ships blank fee cells — show a readable placeholder instead of an empty box.
@@ -206,8 +215,6 @@ function applyCmsTableLayoutToTable(table) {
         cell.innerHTML = '<span class="cms-table-placeholder">As Applicable</span>';
       }
     }
-    cell.style.wordBreak = "normal";
-    cell.style.overflowWrap = "normal";
   });
 
   table.querySelectorAll("tbody tr:nth-child(even)").forEach((row) => {
@@ -1104,7 +1111,7 @@ function renderTable(parent, section) {
 
   const wrapper = document.createElement("div");
   wrapper.className =
-    "cms-table-scroll cms-table-scroll-compact max-w-full w-full rounded-xl border border-gray-200 shadow-sm overflow-hidden";
+    "cms-table-scroll cms-table-scroll-compact max-w-full w-full rounded-xl border border-gray-200 shadow-sm";
   const table = document.createElement("table");
   table.className = "border-collapse text-left text-sm w-full cms-table-compact";
 
@@ -1411,6 +1418,29 @@ function takeUnifiedSectionTableInsertionPoint(headingEl) {
   return null;
 }
 
+function headingRank(el) {
+  const match = /^H([1-6])$/i.exec(el?.tagName || "");
+  return match ? Number(match[1]) : 99;
+}
+
+function hasUnifiedSectionTableAfterHeading(headingEl) {
+  if (!headingEl) return false;
+
+  const level = headingRank(headingEl);
+  let node = headingEl.nextElementSibling;
+  // Walk through nested subheadings (h3 under h2) so we don't inject a
+  // second fee table when contentBody already rendered one later in the same section.
+  while (node) {
+    if (/^H[1-6]$/i.test(node.tagName) && headingRank(node) <= level) break;
+    if (node.matches("table, .cms-table-scroll") || node.querySelector("table")) {
+      return true;
+    }
+    node = node.nextElementSibling;
+  }
+
+  return false;
+}
+
 function previousUnifiedHeading(node, bodyElement) {
   let current = node;
   while (current && current !== bodyElement) {
@@ -1458,6 +1488,12 @@ function syncUnifiedStructuredTables(bodyElement, page) {
 
   bodyElement.querySelectorAll("[data-cms-structured-table='true']").forEach((node) => node.remove());
 
+  // The CMS Content editor writes the real table into `contentBody`. Nested
+  // `type: "table"` fields are often leftover from an older CMS shape and can
+  // disagree with what the author just published (e.g. a 2-col fee table in
+  // the editor vs a stale 3-col table in nestedSections). Never overlay them.
+  if (bodyElement.querySelector("table")) return;
+
   buildSectionOrder(page).forEach((key) => {
     const section = getSectionData(page, key);
 
@@ -1474,6 +1510,8 @@ function syncUnifiedStructuredTables(bodyElement, page) {
     const headingEl = findUnifiedStructuredTableHeading(bodyElement, key, section);
 
     const structuredTables = cmsStructuredTablesForSection(section);
+    if (headingEl && hasUnifiedSectionTableAfterHeading(headingEl)) return;
+
     const tableInsertionPoint =
       structuredTables.length && headingEl ? takeUnifiedSectionTableInsertionPoint(headingEl) : null;
 

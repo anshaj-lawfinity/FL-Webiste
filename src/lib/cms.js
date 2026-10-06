@@ -3,7 +3,7 @@ import { cache } from "react";
 const CMS_BASE_URL =
   process.env.NEXT_PUBLIC_CRM_CMS_BASE_URL ||
   process.env.CRM_CMS_BASE_URL ||
-  "https://internal.lawfinity.in";
+  (process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://internal.lawfinity.in");
 
 // Server fetch cache (ISR/metadata). Override via CMS_REVALIDATE_SECONDS env if needed.
 const CMS_REVALIDATE_SECONDS = Number(process.env.CMS_REVALIDATE_SECONDS || 60);

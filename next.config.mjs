@@ -169,12 +169,24 @@ const nextConfig = {
       },
     ];
   },
-  // Same-origin proxy for CRM blog APIs — avoids browser CORS on views/comments/likes.
+  // Same-origin proxy for CRM APIs — avoids browser CORS on views/comments/likes
+  // and on landing-page sync (FactoryCmsDomSync). In `next dev` the SEO CMS runs
+  // on :3000; production still reads internal.lawfinity.in.
   async rewrites() {
+    const cmsOrigin =
+      process.env.NEXT_PUBLIC_CRM_CMS_BASE_URL ||
+      process.env.CRM_CMS_BASE_URL ||
+      (process.env.NODE_ENV === "development"
+        ? "http://localhost:3000"
+        : "https://internal.lawfinity.in");
     return [
       {
         source: "/api/crm/:path*",
         destination: "https://internal.lawfinity.in/api/:path*",
+      },
+      {
+        source: "/api/public/:path*",
+        destination: `${cmsOrigin}/api/public/:path*`,
       },
     ];
   },
