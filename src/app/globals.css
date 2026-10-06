@@ -193,15 +193,28 @@ body {
   vertical-align: top;
 }
 
-/* Theme header for every CMS content table (structured + HTML tables). */
+/* Theme fill is only the first/header row — CRM often marks body cells as <th>. */
 .cms-table-scroll thead,
 .cms-table-scroll thead th,
 .cms-rich-text table thead,
 .cms-rich-text table thead th,
 .cms-sync-content table thead,
-.cms-sync-content table thead th {
+.cms-sync-content table thead th,
+.cms-table-scroll tbody tr:first-child th,
+.cms-rich-text table tbody tr:first-child th,
+.cms-sync-content table tbody tr:first-child th {
   background-color: #7a3ef2 !important;
   color: #ffffff !important;
+}
+
+.cms-table-scroll tbody td,
+.cms-rich-text table tbody td,
+.cms-sync-content table tbody td,
+.cms-table-scroll tbody tr:not(:first-child) th,
+.cms-rich-text table tbody tr:not(:first-child) th,
+.cms-sync-content table tbody tr:not(:first-child) th {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
 }
 
 /* 3–4 column fee/pricing tables — stretch to wrapper, proportional columns. */

@@ -227,10 +227,15 @@ function stripCmsBodyHighlightArtifacts(html = "") {
 // tables without explicit header markup).
 function promoteCmsBodyTableHeaderCells(html = "") {
   return String(html || "").replace(/<table\b[\s\S]*?<\/table>/gi, (table) => {
-    if (/<th\b/i.test(table)) return table;
-    return table.replace(/<tr\b[^>]*>[\s\S]*?<\/tr>/i, (firstRow) =>
-      firstRow.replace(/<\/?td\b/gi, (tag) => tag.replace(/td/i, "th"))
-    );
+    let rowIndex = 0;
+    return table.replace(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi, (row) => {
+      const isHeaderRow = rowIndex++ === 0;
+      // CRM often marks every cell as <th> — only the first row is the header.
+      if (isHeaderRow) {
+        return row.replace(/<\/?td\b/gi, (tag) => tag.replace(/td/i, "th"));
+      }
+      return row.replace(/<\/?th\b/gi, (tag) => tag.replace(/th/i, "td"));
+    });
   });
 }
 

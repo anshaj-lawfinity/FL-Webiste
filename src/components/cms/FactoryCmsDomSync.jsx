@@ -199,7 +199,7 @@ function applyCmsTableLayoutToTable(table) {
   }
 
   table.querySelectorAll("th, td").forEach((cell) => {
-    const isHeader = cell.tagName === "TH" || Boolean(cell.closest("thead"));
+    const isHeader = Boolean(cell.closest("thead"));
     cell.classList.add("p-3", "align-top", "border");
     cell.style.overflow = "visible";
     if (isHeader) {
@@ -209,51 +209,65 @@ function applyCmsTableLayoutToTable(table) {
       cell.style.whiteSpace = "normal";
       cell.style.overflowWrap = "anywhere";
     } else {
-      cell.classList.add("border-gray-200", isCompactTable ? "whitespace-normal" : "whitespace-nowrap", "min-w-[5.5rem]");
+      cell.classList.add("border-gray-200", "text-gray-800", isCompactTable ? "whitespace-normal" : "whitespace-nowrap", "min-w-[5.5rem]");
+      cell.classList.remove("text-white", "bg-[#7A3EF2]");
+      cell.style.backgroundColor = "#ffffff";
+      cell.style.color = "#1f2937";
       // CRM often ships blank fee cells — show a readable placeholder instead of an empty box.
       if (!String(cell.textContent || "").trim()) {
         cell.innerHTML = '<span class="cms-table-placeholder">As Applicable</span>';
       }
     }
   });
-
-  table.querySelectorAll("tbody tr:nth-child(even)").forEach((row) => {
-    row.classList.add("bg-gray-50");
-  });
 }
 
 // Promote first body row to <thead> when CRM HTML tables omit a real header section.
 function ensureCmsTableHeaderRow(table) {
-  if (!table || table.querySelector("thead")) return;
+  if (!table) return;
 
-  const firstRow =
-    table.querySelector("tbody tr") || table.querySelector("tr");
-  if (!firstRow) return;
+  if (!table.querySelector("thead")) {
+    const firstRow = table.querySelector("tbody tr") || table.querySelector("tr");
+    if (firstRow) {
+      const cells = Array.from(firstRow.children).filter((el) =>
+        /^(TH|TD)$/i.test(el.tagName)
+      );
+      if (cells.length) {
+        const thead = document.createElement("thead");
+        thead.className = "bg-[#7A3EF2] text-white";
+        const headerRow = document.createElement("tr");
 
-  const cells = Array.from(firstRow.children).filter((el) =>
-    /^(TH|TD)$/i.test(el.tagName)
-  );
-  if (!cells.length) return;
+        cells.forEach((cell) => {
+          const th = document.createElement("th");
+          th.className = "p-3 font-semibold align-top text-left border border-white/20 whitespace-normal text-white";
+          th.style.backgroundColor = "#7A3EF2";
+          th.style.color = "#ffffff";
+          ["colspan", "rowspan"].forEach((attr) => {
+            if (cell.hasAttribute(attr)) th.setAttribute(attr, cell.getAttribute(attr));
+          });
+          th.innerHTML = cell.innerHTML;
+          headerRow.appendChild(th);
+        });
 
-  const thead = document.createElement("thead");
-  thead.className = "bg-[#7A3EF2] text-white";
-  const headerRow = document.createElement("tr");
+        thead.appendChild(headerRow);
+        firstRow.remove();
 
-  cells.forEach((cell) => {
-    const th = document.createElement("th");
-    th.className = "p-3 font-semibold align-top text-left border border-white/20 whitespace-normal text-white";
-    th.style.backgroundColor = "#7A3EF2";
-    th.style.color = "#ffffff";
-    th.innerHTML = cell.innerHTML;
-    headerRow.appendChild(th);
+        const tbody = table.querySelector("tbody");
+        if (tbody) table.insertBefore(thead, tbody);
+        else table.insertBefore(thead, table.firstChild);
+      }
+    }
+  }
+
+  // CRM often uses <th> for every row — demote leftover header cells so only
+  // the first row keeps the theme fill.
+  table.querySelectorAll("tbody th").forEach((th) => {
+    const td = document.createElement("td");
+    td.innerHTML = th.innerHTML;
+    ["colspan", "rowspan", "class"].forEach((attr) => {
+      if (th.hasAttribute(attr)) td.setAttribute(attr, th.getAttribute(attr));
+    });
+    th.replaceWith(td);
   });
-
-  thead.appendChild(headerRow);
-  firstRow.remove();
-
-  const tbody = table.querySelector("tbody");
-  if (tbody) table.insertBefore(thead, tbody);
-  else table.insertBefore(thead, table.firstChild);
 }
 
 // Blank CRM table cells render as italic placeholder text (fee tables often omit optional charges).
