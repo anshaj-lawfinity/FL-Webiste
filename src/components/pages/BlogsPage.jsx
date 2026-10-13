@@ -4,7 +4,6 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState, useMemo, useRef, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import BlogCard from "@/components/BlogCard";
-import Head from "next/head";
 import Link from "next/link";
 
 const API_BASE = "https://internal.lawfinity.in";
@@ -257,21 +256,6 @@ function BlogsPage() {
 
     return (
         <div>
-            <Head>
-                <title>Latest Factorry License - Factorylicence</title>
-                <meta
-                    name="description"
-                    content="Stay updated with the latest factory license news and guides on Factorylicence. Explore expert blogs on factory licence registration, renewal, laws, and compliance requirements."
-                />
-                <meta name="keywords" content="Latest Factorry License" />
-                <meta property="og:title" content="Latest Factorry License - Factorylicence" />
-                <meta
-                    property="og:description"
-                    content="Stay updated with the latest factory license news and guides on Factorylicence. Explore expert blogs on factory licence registration, renewal, laws, and compliance requirements."
-                />
-                <meta property="og:type" content="website" />
-                <link rel="canonical" href="https://factorylicence.in/blogs" />
-            </Head>
             <BlogHero
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}

@@ -30,7 +30,7 @@ const TermsConditionsPage = () => {
               Introduction
             </h2>
             <p>
-              • This website is owned by LAWFINITY INDIA PRIVATE LIMITED, having
+              • This website is owned by Factorylicence.in, having
               its registered office at T-10, Plot NO-7, 3rd Floor, Pankaj Plaza
               Pocket-7, Sector-12, Dwarka, South West Delhi, Delhi, Delhi,
               India, 110078. <br />
@@ -95,7 +95,7 @@ const TermsConditionsPage = () => {
             </h2>
             <p>
               All content and materials available on www.factorylicence.in.
-              are the intellectual property of LAWFINITY INDIA PRIVATE
+              are the intellectual property of Factorylicence.in
               LIMITED.
             </p>
           </section>
@@ -116,8 +116,7 @@ const TermsConditionsPage = () => {
                Governing law
             </h2>
             <p>
-              “www.factorylicence.in” website is controlled by LAWFINITY INDIA
-              PRIVATE LIMITED from our offices located in Delhi, India.
+              “www.factorylicence.in” website is controlled by Factorylicence.in from our offices located in Delhi, India.
             </p>
           </section>
 
