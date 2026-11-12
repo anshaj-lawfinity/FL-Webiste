@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import { headers } from "next/headers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ServicePagesMarquee from "@/components/ServicePagesMarquee";
@@ -8,7 +7,6 @@ import Script from "next/script";
 import FloatingGetStartedButton from "@/components/FloatingGetStartedButton";
 import { Poppins } from "next/font/google";
 import TrackingScript from "@/components/TrackingScript";
-import { getBlogBySlug, getBlogSchema } from "@/lib/blogs";
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://factorylicence.in").replace(/\/+$/, "");
 
@@ -37,23 +35,7 @@ export const metadata = {
   },
 };
 
-export default async function RootLayout({ children }) {
-  const headersList = await headers();
-  const pathname = headersList.get("x-pathname") || "";
-  const blogSlugMatch = pathname.match(/^\/blogs\/([^/]+)\/?$/);
-
-  // Blog articles with CRM schemaMarkup — render in <head> (body scripts get corrupted by RSC).
-  let showSiteSchema = true;
-  let blogSchemaJson = null;
-  if (blogSlugMatch) {
-    const blog = await getBlogBySlug(blogSlugMatch[1]);
-    const schema = getBlogSchema(blog);
-    if (schema) {
-      showSiteSchema = false;
-      blogSchemaJson = JSON.stringify(schema).replace(/</g, "\\u003c");
-    }
-  }
-
+export default function RootLayout({ children }) {
   const schemaData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -123,22 +105,12 @@ export default async function RootLayout({ children }) {
             __html: `(function(){var e=console.error;var msg="Unable to store cookie";console.error=function(){var a=arguments[0];var s=typeof a==="string"?a:(a&&a.message||"");if(s&&s.indexOf(msg)!==-1)return;return e.apply(console,arguments);};})();`,
           }}
         />
-        {/* CRM blog schemaMarkup in head — must not live in page body (Next.js RSC truncates it). */}
-        {blogSchemaJson ? (
-          <script
-            id="blog-schema-org"
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: blogSchemaJson }}
-          />
-        ) : null}
-        {/* Sitewide schema — omitted on blog articles that ship CRM schemaMarkup */}
-        {showSiteSchema ? (
-          <script
-            id="schema-org"
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-          />
-        ) : null}
+        {/* Sitewide schema */}
+        <script
+          id="schema-org"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        />
 
         {/* Third-party tags are delayed so they do not compete with the LCP hero image. */}
         <Script id="gtm-script" strategy="lazyOnload">

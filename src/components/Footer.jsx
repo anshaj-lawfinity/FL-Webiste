@@ -41,21 +41,21 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-[#8653F4] text-gray-200 px-6 py-6 border-t border-slate-700">
+    <footer className="bg-[#8653F4] text-white px-6 py-6 border-t border-slate-700">
       <div className="max-w-7xl mx-auto grid sm:grid-cols-2 lg:grid-cols-4 gap-10 text-sm">
         {/* Column 1 */}
         <div className="w-full flex items-center justify-center flex-col">
           <FL />
-          <h4 className="text-2xl mt-10 italic font-semibold mb-6 tracking-wide text-purple-100">
+          <h3 className="text-2xl mt-10 italic font-semibold mb-6 tracking-wide text-purple-100">
             Factory Licencing Made Simple With factorylicence.in
-          </h4>
+          </h3>
         </div>
 
         {/* Column 2 */}
         <div>
-          <h4 className="text-2xl font-semibold mb-6 tracking-wide text-purple-100">
+          <h3 className="text-2xl font-semibold mb-6 tracking-wide text-purple-100">
             Contacts
-          </h4>
+          </h3>
           <address className="not-italic text-gray-100 leading-relaxed">
             T-10, Plot No. -7, 3rd Floor, Pankaj Plaza, Pocket-7, Sector-12,
             Dwarka, New Delhi - 110078
@@ -129,9 +129,9 @@ export default function Footer() {
 
         {/* Column 3 - Services */}
         <div>
-          <h4 className="text-2xl font-semibold mb-6 tracking-wide text-purple-100">
+          <h3 className="text-2xl font-semibold mb-6 tracking-wide text-purple-100">
             Services
-          </h4>
+          </h3>
           <ul className="space-y-2">
             {services.map((link) => (
               <li key={link.href}>
@@ -148,9 +148,9 @@ export default function Footer() {
 
         {/* Column 4 - Quick Links */}
         <div>
-          <h4 className="text-2xl font-semibold mb-6 tracking-wide text-purple-100">
+          <h3 className="text-2xl font-semibold mb-6 tracking-wide text-purple-100">
             Quick Links
-          </h4>
+          </h3>
           <ul className="space-y-2 ">
             {quickLinks.map((link) => (
               <li key={link.href}>

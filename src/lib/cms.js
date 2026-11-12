@@ -86,10 +86,10 @@ export const getFactoryCmsStaticPage = cache(async (pageKey) => {
   return fetchCms(`/api/public/factorylicence/static-pages/${pageKey}`);
 });
 
-// Uncached fetch for metadata — avoids stale SEO when CRM publishes.
-export async function getFactoryCmsStaticPageFresh(pageKey) {
+// Uncached across requests, but deduped within one render (metadata + page).
+export const getFactoryCmsStaticPageFresh = cache(async (pageKey) => {
   return fetchCms(`/api/public/factorylicence/static-pages/${pageKey}`, { fresh: true });
-}
+});
 
 function normalizeCmsKeywords(keywords) {
   if (Array.isArray(keywords)) return keywords.filter(Boolean);
@@ -177,7 +177,7 @@ export function buildCmsMetadata(page, fallback = {}) {
 }
 
 export async function buildLandingPageMetadata(slug, fallback = {}) {
-  const page = await getFactoryCmsLandingPageLive(slug);
+  const page = await getFactoryCmsLandingPage(slug);
   return buildCmsMetadata(page, fallback);
 }
 

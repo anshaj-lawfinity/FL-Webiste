@@ -100,6 +100,21 @@ import { CmsStaticSyncBoundary } from "@/components/cms/FactoryCmsJsonLd";
 const Page = () => {
   return (
     <>
+      {/* Preload LCP hero image — browser fetches it before JS hydrates HeroSection */}
+      <link
+        rel="preload"
+        as="image"
+        href="/assets/factory-license-registration.webp"
+        fetchPriority="high"
+        media="(min-width: 768px)"
+      />
+      <link
+        rel="preload"
+        as="image"
+        href="/assets/factory-license-registration-mobile.jpg"
+        fetchPriority="high"
+        media="(max-width: 767px)"
+      />
       <HeroSection />
       <HeroVideoSection />
       <UniversalFeeCalculator />

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import BlogsClientUI from '@/components/BlogsClientUI';
-import { getBlogBySlug, getBlogRobots } from '@/lib/blogs';
+import { getBlogBySlug, getBlogRobots, getBlogSchema } from '@/lib/blogs';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -108,8 +108,20 @@ export default async function BlogDetails({ params }) {
   const blog = await getBlog(resolvedParams.slug);
   if (!blog) return notFound();
 
+  const blogSchema = getBlogSchema(blog);
+  const blogSchemaJson = blogSchema
+    ? JSON.stringify(blogSchema).replace(/</g, "\\u003c")
+    : null;
+
   return (
     <div>
+      {blogSchemaJson ? (
+        <script
+          id="blog-schema-org"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: blogSchemaJson }}
+        />
+      ) : null}
       <Script async src="https://www.googletagmanager.com/gtag/js?id=AW-17199345901" />
       <Script id="gtag-init" strategy="afterInteractive">
         {`

@@ -1,6 +1,6 @@
 import DisclaimerPage from "@/components/pages/DisclaimerPage";
 import FactoryCmsStaticPage from "@/components/cms/FactoryCmsStaticPage";
-import { buildCmsMetadata, getFactoryCmsStaticPageFresh } from "@/lib/cms";
+import { buildCmsMetadata, getFactoryCmsStaticPage } from "@/lib/cms";
 import { Suspense } from "react";
 
 // ISR: cache rendered page for 5 minutes instead of blocking on CMS every request.
@@ -29,7 +29,7 @@ const fallbackMetadata = {
 };
 
 export async function generateMetadata() {
-  const cmsPage = await getFactoryCmsStaticPageFresh("disclaimer");
+  const cmsPage = await getFactoryCmsStaticPage("disclaimer");
   return buildCmsMetadata(cmsPage, fallbackMetadata);
 }
 
@@ -42,7 +42,7 @@ export default function Page() {
 }
 
 async function DisclaimerCmsContent() {
-  const cmsPage = await getFactoryCmsStaticPageFresh("disclaimer");
+  const cmsPage = await getFactoryCmsStaticPage("disclaimer");
 
   if (cmsPage) {
     return <FactoryCmsStaticPage page={cmsPage} fallbackTitle="Disclaimer" />;

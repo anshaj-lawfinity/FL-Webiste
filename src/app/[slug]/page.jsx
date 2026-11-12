@@ -45,7 +45,7 @@ export default async function CmsLandingSlugPage({ params }) {
   return (
     <>
       <CmsDynamicLandingPage page={page} />
-      <CmsLandingBoundary slug={slug} />
+      <CmsLandingBoundary slug={slug} page={page} />
     </>
   );
 }

@@ -51,8 +51,10 @@ export default async function Page() {
 
   return (
     <>
+      <link rel="preload" as="image" href="/assets/factory-fire-noc-apply-online-up.webp" fetchPriority="high" media="(min-width: 768px)" />
+      <link rel="preload" as="image" href="/assets/factory-fire-noc-apply-online-up-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
       <FireNOCUPPage page={page} />
-      <CmsLandingBoundary slug={LANDING_SLUG} />
+      <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );
 }

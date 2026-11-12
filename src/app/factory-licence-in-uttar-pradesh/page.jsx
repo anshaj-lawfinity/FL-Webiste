@@ -51,8 +51,10 @@ export default async function Page() {
 
   return (
     <>
+      <link rel="preload" as="image" href="/assets/factories-act-license-in-up.webp" fetchPriority="high" media="(min-width: 768px)" />
+      <link rel="preload" as="image" href="/assets/factories-act-license-in-up-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
       <FactoryLicenceUttarPradeshPage page={page} />
-      <CmsLandingBoundary slug={LANDING_SLUG} />
+      <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );
 }
