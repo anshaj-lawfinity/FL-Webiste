@@ -13,7 +13,8 @@ import {
   normalizeBlogPresentationVersion,
   sanitizeBlogHtml,
 } from "@/lib/blogPresentation.mjs";
-
+import { homepageContent } from "@/data/cta";
+import ContactFormModal from "./ContactFormModal";
 /* =========================
    Helpers
    ========================= */
@@ -73,6 +74,28 @@ const BLOG_IMAGE_ALT_OVERRIDES = {
     "Factory Compliance Checklist",
   ],
 };
+
+function BlogCta() {
+  const { cta, ctaText, buttonText } = homepageContent.footer;
+  const [showPopup, setShowPopup] = useState(false);
+  return (
+    <>
+    <div className="blog-inline-cta">
+      <div>
+        <h2>{cta}</h2>
+        <p>{ctaText}</p>
+      </div>
+      <button 
+      type="button"
+      className="flex-1 bg-[#7A3EF2] text-white font-semibold py-3.5 rounded-full shadow-lg hover:bg-[#6b2ee8] transition-colors focus:outline-none focus:ring-2 focus:ring-[#7A3EF2] focus:ring-offset-2"
+      onClick={() => setShowPopup(true)}
+      aria-label={`${buttonText} - Open contact form`}
+      >{buttonText}</button>
+    </div>
+    <ContactFormModal isOpen={showPopup} onClose={() => setShowPopup(false)} />
+    </>
+  );
+}
 
 function getBlogImageAlt(blog, imageIndex = 0) {
   const slug = blog?.urlSlug || blog?.slug || "";
@@ -715,13 +738,14 @@ export default function BlogsClientUI({ blog }) {
               }}
             />
           ) : null}
+          <BlogCta />
         </div>
 
         <aside className="w-full lg:w-1/4 hidden lg:block right-0 lg:mt-6 lg:sticky lg:top-32">
           {/* Desktop Table of Contents & Contact Form: only show on lg and up */}
           <div className="z-10 sticky top-32">
-            <TableOfContents headings={headings} activeId={activeHeadingId} />
             <BlogSidebarContactForm />
+            <TableOfContents headings={headings} activeId={activeHeadingId} />
           </div>
 
         </aside>
@@ -783,97 +807,6 @@ export default function BlogsClientUI({ blog }) {
           </ul>
         </section>
       )}
-
-      {/* Like Button */}
-      <div className="max-w-7xl mx-auto py-6 px-4">
-        <div className="mt-4">
-          {hasLiked ? (
-            <p className="text-blue-700 font-medium flex gap-3 items-center">
-              Liked <AiTwotoneLike />
-            </p>
-          ) : (
-            <button
-              onClick={handleLike}
-              className="bg-blue-600 hover:bg-blue-700 px-4 py-1 rounded text-white flex gap-3 items-center"
-            >
-              <AiOutlineLike /> Like ({likes})
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Share Section */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <h2 className="text-lg font-medium mb-2">Share this blog</h2>
-        <div className="flex gap4 flex-wrap">
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(currentUrl);
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
-            }}
-            className="text-gray-600 text-3xl px-4 py-2 rounded hover:scale-110 flex items-center gap-2"
-          >
-            <FaRegCopy />
-            {copied && (
-              <span className="text-green-500 text-xs mt-1 absolute -bottom-4 left-0">
-                Copied!
-              </span>
-            )}
-          </button>
-
-          {typeof navigator !== "undefined" && navigator.share && (
-            <button
-              onClick={() => {
-                navigator
-                  .share({
-                    title: blog.title,
-                    text: "Check out this blog!",
-                    url: currentUrl,
-                  })
-                  .catch((err) => console.error("Sharing failed", err));
-              }}
-              className="text-blue-600 text-3xl px-4 py-2 rounded"
-            >
-              <FaRegShareFromSquare />
-            </button>
-          )}
-
-          <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-              currentUrl
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-800 text-3xl px-4 py-2 rounded"
-          >
-            <FaFacebook />
-          </a>
-
-          <a
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-              currentUrl
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-700 text-3xl px-4 py-2 rounded"
-          >
-            <FaLinkedin />
-          </a>
-
-          <a
-            href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
-              currentUrl
-            )}&text=${encodeURIComponent(blog.title)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 px-4 py-2 rounded text-3xl"
-          >
-            <FaTwitter />
-          </a>
-        </div>
-      </div>
-
       <style jsx>{`
         :global(.prose) {
           color: #0f172a; /* slate-900 */

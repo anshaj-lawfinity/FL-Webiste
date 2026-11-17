@@ -353,6 +353,13 @@ svg[data-cms-heading-icon="true"] {
   white-space: nowrap;
   line-height: 2;
 }
+.blog-inline-cta { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 28px 46px; border-radius: 28px; background: #dff7fb; color: var(--ink); box-shadow: 0 16px 34px rgba(20,70,125,.12); margin: 40px 0; }
+.blog-inline-cta h2 { margin: 0 0 5px; font-size: 20px; }
+.blog-inline-cta p { margin: 0; color: var(--muted); font-size: 13px; }
+.blog-inline-cta a { flex-shrink: 0; padding: 13px 20px; border-radius: 8px; background: #0a2738; color: #fff; font-size: 13px; font-weight: 900; white-space: nowrap; }
+@media (max-width: 767px) {
+  .blog-inline-cta { display: none; }
+}
 .fl-blog-content--v2 :where(th, td) { padding: .6875rem .875rem; text-align: left; }
 .fl-blog-content--v2 th { background: #7a3ef2; color: #fff; }
 .fl-blog-content--v2 tr:nth-child(even) td { background: #f8f6ff; }
