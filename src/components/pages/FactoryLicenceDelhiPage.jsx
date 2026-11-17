@@ -2,10 +2,7 @@
 
 "use client";
 
-import { lazy, Suspense, useState } from "react";
-const FaIndustry = lazy(() =>
-  import("react-icons/fa").then((mod) => ({ default: mod.FaIndustry }))
-);
+import { Suspense, useState } from "react";
 import { RiTimeLine } from "react-icons/ri";
 import FactoryLicenseCalculatorDelhi from '@/components/FactoryLicenseCalculatorDelhi'
 import { FaCalculator } from "react-icons/fa";
@@ -19,6 +16,7 @@ import {
   FaListOl,
   FaClock,
   FaExclamationTriangle,
+  FaIndustry,
 } from "react-icons/fa";
 
 import HeroRotatingBackground from "@/components/HeroRotatingBackground";

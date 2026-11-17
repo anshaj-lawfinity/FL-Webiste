@@ -56,12 +56,12 @@ export default function Footer() {
           <h3 className="text-2xl font-semibold mb-6 tracking-wide text-purple-100">
             Contacts
           </h3>
-          <address className="not-italic text-gray-100 leading-relaxed">
+          <address className="not-italic text-white leading-relaxed">
             T-10, Plot No. -7, 3rd Floor, Pankaj Plaza, Pocket-7, Sector-12,
             Dwarka, New Delhi - 110078
           </address>
 
-          <p className="text-gray-100 mt-6 leading-relaxed">
+          <p className="text-white mt-6 leading-relaxed">
             <span className="font-semibold">Mon – Sat:</span> 10am – 7pm
           </p>
 
@@ -180,12 +180,12 @@ export default function Footer() {
       </div>
 
       {/* Footer Bottom — !text-center keeps copyright centered when CMS sync adds text-left to body <p> (e.g. /blogs) */}
-      <div className="max-w-7xl mx-auto w-full text-center text-xs text-gray-100 border-t border-gray-200 pt-4 pb-20 md:pb-0">
+      <div className="max-w-7xl mx-auto w-full text-center text-xs text-white border-t border-gray-200 pt-4 pb-20 md:pb-0">
         <p className="!text-center">
           All Rights Reserved {new Date().getFullYear()}.{" "}
           <Link
             href="/"
-            className="text-purple-100 hover:text-purple-800 transition-colors font-semibold"
+            className="text-white hover:text-purple-200 transition-colors font-semibold"
           >
             factorylicence.in 
           </Link>{" "}

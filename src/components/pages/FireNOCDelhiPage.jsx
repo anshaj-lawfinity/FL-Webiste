@@ -1,9 +1,6 @@
 "use client";
 
-import { lazy, Suspense, useState } from "react";
-const FaIndustry = lazy(() =>
-  import("react-icons/fa").then((mod) => ({ default: mod.FaIndustry }))
-);
+import { Suspense, useState } from "react";
 import {
   FaQuestionCircle,
   FaCheckCircle,
@@ -16,6 +13,7 @@ import {
   FaCalendarAlt,
   FaSync,
   FaBuilding,
+  FaIndustry,
 } from "react-icons/fa";
 import HeroRotatingBackground from "@/components/HeroRotatingBackground";
 import { PAGE_IMAGES } from "@/lib/heroBackgrounds";

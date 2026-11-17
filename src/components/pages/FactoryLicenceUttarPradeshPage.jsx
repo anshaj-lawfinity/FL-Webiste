@@ -1,9 +1,6 @@
 "use client";
 
-import { lazy, Suspense, useState } from "react";
-const FaIndustry = lazy(() =>
-  import("react-icons/fa").then((mod) => ({ default: mod.FaIndustry }))
-);
+import { Suspense, useState } from "react";
 import { RiTimeLine } from "react-icons/ri";
 import TUP from "@/components/TUP";
 
@@ -14,6 +11,7 @@ import {
   FaUserCheck,
   FaFileAlt,
   FaListOl,
+  FaIndustry,
 } from "react-icons/fa";
 import { FaCalculator } from "react-icons/fa";
 

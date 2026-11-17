@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { normalizeBlogPresentationVersion } from "@/lib/blogPresentation.mjs";
 
 const API_BASE = "https://internal.lawfinity.in";
 
@@ -317,7 +318,12 @@ export const getBlogBySlug = cache(async (slug) => {
       const blog = await res.json();
       // Reject blogs that belong to another website (e.g. Lawfinity) even though the
       // slug matched in the shared CRM database.
-      if (blog && !blog.error && belongsToThisSite(blog)) return blog;
+      if (blog && !blog.error && belongsToThisSite(blog)) {
+        return {
+          ...blog,
+          presentationVersion: normalizeBlogPresentationVersion(blog.presentationVersion),
+        };
+      }
     }
   } catch {
     // Fall back to list snapshot below.
@@ -325,5 +331,8 @@ export const getBlogBySlug = cache(async (slug) => {
 
   const blogs = await fetchPublishedBlogs();
   if (!blogs) return null;
-  return blogs.find((blog) => blog?.urlSlug === slug) || null;
+  const blog = blogs.find((item) => item?.urlSlug === slug);
+  return blog
+    ? { ...blog, presentationVersion: normalizeBlogPresentationVersion(blog.presentationVersion) }
+    : null;
 });

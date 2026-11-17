@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import BlogCard from "@/components/BlogCard";
 import Link from "next/link";
 
-const API_BASE = "https://internal.lawfinity.in";
+// Use the same-origin /api/crm proxy (next.config.mjs rewrites /api/crm/:path* →
+// https://internal.lawfinity.in/api/:path*) to avoid browser CORS on the listing calls.
+const API_BASE = "/api/crm";
 const PAGE_SIZE = 9;
 
 
@@ -59,7 +61,7 @@ function BlogsPage() {
         if (selectedSubSubCategory !== "All") params.append("subSubCategory", selectedSubSubCategory);
         if (submittedSearch.trim()) params.append("searchTerm", submittedSearch.trim());
         if (filterType === "Most Viewed") params.append("filterType", "Most Viewed");
-        return `${API_BASE}/api/public/published-fl?${params.toString()}`;
+        return `${API_BASE}/public/published-fl?${params.toString()}`;
     }
 
     // --- Fetch blogs based on current page and filters
@@ -115,7 +117,7 @@ function BlogsPage() {
         async function fetchCategories() {
             try {
                 const res = await fetch(
-                    `${API_BASE}/api/public/published-fl/all-publshed-blogs-category`,
+                    `${API_BASE}/public/published-fl/all-publshed-blogs-category`,
                     { cache: "no-store", mode: "cors" }
                 );
                 const data = await res.json();

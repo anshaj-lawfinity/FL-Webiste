@@ -16,8 +16,7 @@ export default function HeroVideoSection() {
               alt="Factory Licence Video Preview"
               fill
               sizes="(max-width: 768px) 100vw, 896px"
-              loading="lazy"
-              decoding="async"
+              priority
               className="absolute inset-0 w-full h-full object-cover"
             />}
           />

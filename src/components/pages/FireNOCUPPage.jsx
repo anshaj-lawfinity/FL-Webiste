@@ -1,9 +1,6 @@
 "use client";
 
-import { lazy, Suspense, useState } from "react";
-const FaIndustry = lazy(() =>
-  import("react-icons/fa").then((mod) => ({ default: mod.FaIndustry }))
-);
+import { Suspense, useState } from "react";
 import { RiTimeLine } from "react-icons/ri";
 import { AiOutlineEdit } from "react-icons/ai";
 import TH from "@/components/TH";
@@ -21,6 +18,7 @@ import {
   FaSync,
   FaBuilding,
   FaCheckDouble,
+  FaIndustry,
 } from "react-icons/fa";
 import FaqSectionPollutionUP from "@/components/FaqSectionPollutionUP"; // You can rename this if needed
 import BreadcrumbNav from "@/components/BreadcrumbNav";

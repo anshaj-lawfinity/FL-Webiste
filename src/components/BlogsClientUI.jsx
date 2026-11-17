@@ -8,6 +8,11 @@ import BlogSidebarContactForm from "./BlogSidebarContactForm";
 import { AiOutlineLike, AiTwotoneLike } from "react-icons/ai";
 import { FaRegCopy, FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
+import {
+  getBlogPresentationClass,
+  normalizeBlogPresentationVersion,
+  sanitizeBlogHtml,
+} from "@/lib/blogPresentation.mjs";
 
 /* =========================
    Helpers
@@ -488,8 +493,6 @@ export default function BlogsClientUI({ blog }) {
   const [activeHeadingId, setActiveHeadingId] = useState("");
   const blogTitle = normalizeDisplayText(blog.title);
 
-  console.log(blog);
-
   const BLOG_WEBSITE_URL =
     process.env.NEXT_PUBLIC_BLOG_API_URL ||
     process.env.BLOG_WEBSITE_URL ||
@@ -602,7 +605,12 @@ export default function BlogsClientUI({ blog }) {
 
   // 🔥 One normalized HTML for everything (shows images inline)
   const htmlToRender = getNormalizedHtml(blog);
-  const processedHtmlToRender = normalizeBlogHtml(htmlToRender);
+  const normalizedHtmlToRender = normalizeBlogHtml(htmlToRender);
+  const presentationVersion = normalizeBlogPresentationVersion(blog.presentationVersion);
+  const processedHtmlToRender = presentationVersion === 2
+    ? sanitizeBlogHtml(normalizedHtmlToRender, presentationVersion)
+    : normalizedHtmlToRender;
+  const presentationClass = getBlogPresentationClass(presentationVersion);
   const headings = extractH2Headings(processedHtmlToRender);
 
   function optimizeInlineImages(html) {
@@ -701,7 +709,7 @@ export default function BlogsClientUI({ blog }) {
           {/* 👇 Always render normalized HTML (shows inline images too) */}
           {htmlToRender ? (
             <div
-              className="prose max-w-none"
+              className={`prose fl-blog-content ${presentationClass} max-w-none`}
               dangerouslySetInnerHTML={{
                 __html: optimizeInlineImages(processedHtmlToRender),
               }}
