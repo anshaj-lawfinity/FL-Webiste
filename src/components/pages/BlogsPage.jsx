@@ -4,10 +4,11 @@ export const dynamic = "force-dynamic";
 import { useEffect, useState, useMemo, useRef, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import BlogCard from "@/components/BlogCard";
-import Head from "next/head";
 import Link from "next/link";
 
-const API_BASE = "https://internal.lawfinity.in";
+// Use the same-origin /api/crm proxy (next.config.mjs rewrites /api/crm/:path* →
+// https://internal.lawfinity.in/api/:path*) to avoid browser CORS on the listing calls.
+const API_BASE = "/api/crm";
 const PAGE_SIZE = 9;
 
 
@@ -60,7 +61,7 @@ function BlogsPage() {
         if (selectedSubSubCategory !== "All") params.append("subSubCategory", selectedSubSubCategory);
         if (submittedSearch.trim()) params.append("searchTerm", submittedSearch.trim());
         if (filterType === "Most Viewed") params.append("filterType", "Most Viewed");
-        return `${API_BASE}/api/public/published-fl?${params.toString()}`;
+        return `${API_BASE}/public/published-fl?${params.toString()}`;
     }
 
     // --- Fetch blogs based on current page and filters
@@ -116,7 +117,7 @@ function BlogsPage() {
         async function fetchCategories() {
             try {
                 const res = await fetch(
-                    `${API_BASE}/api/public/published-fl/all-publshed-blogs-category`,
+                    `${API_BASE}/public/published-fl/all-publshed-blogs-category`,
                     { cache: "no-store", mode: "cors" }
                 );
                 const data = await res.json();
@@ -257,21 +258,6 @@ function BlogsPage() {
 
     return (
         <div>
-            <Head>
-                <title>Latest Factorry License - Factorylicence</title>
-                <meta
-                    name="description"
-                    content="Stay updated with the latest factory license news and guides on Factorylicence. Explore expert blogs on factory licence registration, renewal, laws, and compliance requirements."
-                />
-                <meta name="keywords" content="Latest Factorry License" />
-                <meta property="og:title" content="Latest Factorry License - Factorylicence" />
-                <meta
-                    property="og:description"
-                    content="Stay updated with the latest factory license news and guides on Factorylicence. Explore expert blogs on factory licence registration, renewal, laws, and compliance requirements."
-                />
-                <meta property="og:type" content="website" />
-                <link rel="canonical" href="https://factorylicence.in/blogs" />
-            </Head>
             <BlogHero
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}

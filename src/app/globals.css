@@ -34,3 +34,420 @@ body {
 .animate-bounce-gentle {
   animation: bounce-gentle 1s ease-in-out infinite;
 }
+
+.cms-rich-text ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.cms-rich-text ol {
+  list-style-type: decimal;
+  padding-left: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.cms-rich-text li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.cms-rich-text p,
+.cms-sync-content p {
+  margin-bottom: 0.75rem;
+}
+
+.cms-rich-text p,
+.cms-sync-content p,
+.cms-rich-text li,
+.cms-sync-content li {
+  /* !important beats CMS/Tailwind `text-justify` on narrow screens (avoids huge word gaps). */
+  text-align: left !important;
+}
+
+/* CMS body copy: left on mobile, justified from md breakpoint up. */
+@media (min-width: 768px) {
+  .cms-rich-text p,
+  .cms-sync-content p,
+  .cms-rich-text li,
+  .cms-sync-content li {
+    text-align: justify !important;
+  }
+}
+
+.cms-rich-text strong {
+  font-weight: 700;
+}
+
+.cms-rich-text b {
+  font-weight: 700;
+}
+
+.cms-rich-text em,
+.cms-rich-text i {
+  font-style: italic;
+}
+
+.cms-rich-text u {
+  text-decoration: underline;
+}
+
+.cms-rich-text h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 1rem 0 0.5rem;
+}
+
+.cms-rich-text h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.cms-sync-content strong,
+.cms-sync-content b {
+  font-weight: 700;
+}
+
+/* CMS synced content: stay within viewport on mobile (wide tables/images break grid) */
+.cms-sync-content,
+.cms-rich-text {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.cms-rich-text > table,
+.cms-sync-content > table {
+  width: 100% !important;
+  max-width: 100%;
+}
+
+/* Wide fee/data tables — horizontal scroll on mobile instead of crushed columns. */
+.cms-table-scroll {
+  max-width: 100%;
+  min-width: 0;
+  /* scroll (not auto) keeps the bar visible so users know more columns are on the right */
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(122, 62, 242, 0.55) rgba(122, 62, 242, 0.12);
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+/* WebKit — always show a slim purple scrollbar on wide tables */
+.cms-table-scroll::-webkit-scrollbar {
+  height: 8px;
+  -webkit-appearance: none;
+}
+
+.cms-table-scroll::-webkit-scrollbar-track {
+  background: rgba(122, 62, 242, 0.12);
+  border-radius: 4px;
+}
+
+.cms-table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(122, 62, 242, 0.55);
+  border-radius: 4px;
+}
+
+/* Undo cms-sync-content break-word inside scrollable tables. */
+.cms-sync-content .cms-table-scroll,
+.cms-sync-content .cms-table-scroll *,
+.cms-rich-text .cms-table-scroll,
+.cms-rich-text .cms-table-scroll * {
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+/* Wide data tables only — fee tables use .cms-table-compact (full width). */
+.cms-rich-text .cms-table-scroll table:not(.cms-table-compact),
+.cms-sync-content .cms-table-scroll table:not(.cms-table-compact),
+.cms-table-scroll table:not(.cms-table-compact) {
+  width: max-content !important;
+  min-width: 640px !important;
+  max-width: none !important;
+  border-collapse: collapse;
+  table-layout: auto;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+}
+
+.cms-table-scroll th {
+  min-width: 5.5rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: top;
+}
+
+.cms-table-scroll td {
+  min-width: 5.5rem;
+  white-space: nowrap;
+  word-break: normal !important;
+  overflow-wrap: normal !important;
+  vertical-align: top;
+}
+
+/* Theme fill is only the first/header row — CRM often marks body cells as <th>. */
+.cms-table-scroll thead,
+.cms-table-scroll thead th,
+.cms-rich-text table thead,
+.cms-rich-text table thead th,
+.cms-sync-content table thead,
+.cms-sync-content table thead th,
+.cms-table-scroll tbody tr:first-child th,
+.cms-rich-text table tbody tr:first-child th,
+.cms-sync-content table tbody tr:first-child th {
+  background-color: #7a3ef2 !important;
+  color: #ffffff !important;
+}
+
+.cms-table-scroll tbody td,
+.cms-rich-text table tbody td,
+.cms-sync-content table tbody td,
+.cms-table-scroll tbody tr:not(:first-child) th,
+.cms-rich-text table tbody tr:not(:first-child) th,
+.cms-sync-content table tbody tr:not(:first-child) th {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+}
+
+/* 3–4 column fee/pricing tables — stretch to wrapper, proportional columns. */
+.cms-rich-text .cms-table-scroll table.cms-table-compact,
+.cms-sync-content .cms-table-scroll table.cms-table-compact,
+.cms-table-scroll table.cms-table-compact {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  table-layout: auto !important;
+}
+
+.cms-rich-text .cms-table-scroll table.cms-table-compact th,
+.cms-rich-text .cms-table-scroll table.cms-table-compact td,
+.cms-sync-content .cms-table-scroll table.cms-table-compact th,
+.cms-sync-content .cms-table-scroll table.cms-table-compact td,
+.cms-table-scroll table.cms-table-compact th,
+.cms-table-scroll table.cms-table-compact td {
+  white-space: normal !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+}
+
+/* Fee tables fit content — no forced scrollbar when columns fill the row. */
+.cms-table-scroll-compact {
+  overflow-x: auto;
+}
+
+.cms-table-placeholder {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.cms-rich-text img,
+.cms-sync-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.cms-rich-text p:empty,
+.cms-sync-content p:empty {
+  display: none;
+  margin: 0;
+}
+
+/* CMS h2 icons — medium on mobile (20px), slightly larger on desktop; caps flex blow-up. */
+svg[data-cms-heading-icon="true"] {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  max-width: 1.25rem !important;
+  max-height: 1.25rem !important;
+}
+
+@media (min-width: 768px) {
+  svg[data-cms-heading-icon="true"] {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    max-width: 1.5rem !important;
+    max-height: 1.5rem !important;
+  }
+}
+
+@keyframes service-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* Exactly one half-width — matches the duplicated track in ServicePagesMarquee. */
+    transform: translateX(-50%);
+  }
+}
+
+/* JS-driven marquee (ServiceMarqueeClient) — hide native scrollbar; arrows handle move. */
+.service-marquee-viewport {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.service-marquee-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+/* Legacy CSS loop kept only as fallback if a track still uses the animation class alone. */
+.service-marquee-track.is-css-marquee {
+  animation: service-marquee-scroll 40s linear infinite;
+  will-change: transform;
+}
+
+.service-marquee-viewport:hover .service-marquee-track.is-css-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-marquee-track.is-css-marquee {
+    animation: none;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+/* Grid main column must shrink below intrinsic CMS table width */
+[class*="col-span-3"] {
+  min-width: 0;
+}
+
+/* State landing pages ship `text-justify` on p/li — left align on mobile to avoid word gaps. */
+@media (max-width: 767px) {
+  [class*="col-span-3"] :is(p, li) {
+    text-align: left !important;
+  }
+
+  [class*="col-span-3"] .text-justify {
+    text-align: left !important;
+  }
+}
+
+/* Modern blog presentation. V1 retains the component's existing prose rules. */
+.fl-blog-content--v2 {
+  color: #26354d;
+  font-size: 1.0625rem;
+  line-height: 1.78;
+}
+
+.fl-blog-content--v2 :where(h2, h3, h4) { scroll-margin-top: 7rem; color: #7a3ef2; }
+.fl-blog-content--v2 :where(table) {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 1.625rem 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  white-space: nowrap;
+  line-height: 2;
+}
+.blog-inline-cta { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 28px 46px; border-radius: 28px; background: #dff7fb; color: var(--ink); box-shadow: 0 16px 34px rgba(20,70,125,.12); margin: 40px 0; }
+.blog-inline-cta h2 { margin: 0 0 5px; font-size: 20px; }
+.blog-inline-cta p { margin: 0; color: var(--muted); font-size: 13px; }
+.blog-inline-cta a { flex-shrink: 0; padding: 13px 20px; border-radius: 8px; background: #0a2738; color: #fff; font-size: 13px; font-weight: 900; white-space: nowrap; }
+@media (max-width: 767px) {
+  .blog-inline-cta { display: none; }
+}
+.fl-blog-content--v2 :where(th, td) { padding: .6875rem .875rem; text-align: left; }
+.fl-blog-content--v2 th { background: #7a3ef2; color: #fff; }
+.fl-blog-content--v2 tr:nth-child(even) td { background: #f8f6ff; }
+
+.fl-blog-content--v2 :where(.law-quick-answer, .law-tip, .law-caution, .law-warning, .law-takeaway) {
+  position: relative;
+  margin: 1.625rem 0;
+  padding: 1.0625rem 1.125rem 1.0625rem 3.125rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+.fl-blog-content--v2 :where(.law-quick-answer, .law-tip, .law-caution, .law-warning, .law-takeaway)::before {
+  position: absolute;
+  top: 1.0625rem;
+  left: 1.0625rem;
+  font-weight: 800;
+}
+.fl-blog-content--v2 .law-quick-answer { border-left: 4px solid #219653; background: #effaf3; color: #174c2d; }
+.fl-blog-content--v2 .law-quick-answer::before { content: "✓"; }
+.fl-blog-content--v2 .law-tip { border-left: 4px solid #6d35db; background: #f5f1ff; color: #3d2370; }
+.fl-blog-content--v2 .law-tip::before { content: "i"; }
+.fl-blog-content--v2 .law-caution { border-left: 4px solid #d96a17; background: #fff7ed; color: #713416; }
+.fl-blog-content--v2 .law-caution::before,
+.fl-blog-content--v2 .law-warning::before { content: "!"; }
+.fl-blog-content--v2 .law-warning { border-left: 4px solid #cf3f3f; background: #fff1f1; color: #702222; font-weight: 600; }
+.fl-blog-content--v2 .law-takeaway { border-left: 4px solid #7a3ef2; background: #f6f2ff; color: #402673; }
+.fl-blog-content--v2 .law-takeaway::before { content: "→"; }
+
+.fl-blog-content--v2 .law-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: .75rem;
+  margin: 1.625rem 0;
+  padding: 0;
+  list-style: none;
+}
+.fl-blog-content--v2 .law-facts li {
+  margin: 0;
+  padding: .875rem 1rem;
+  border: 1px solid #e3dcf5;
+  border-radius: 8px;
+  background: #faf9ff;
+  font-weight: 600;
+}
+.fl-blog-content--v2 .law-steps { counter-reset: law-step; margin: 1.625rem 0; padding: 0; list-style: none; }
+.fl-blog-content--v2 ul.law-checklist,
+.fl-blog-content--v2 ol.law-steps {
+  list-style-type: none !important;
+  list-style-position: inside;
+  padding-left: 0;
+}
+.fl-blog-content--v2 ul.law-checklist > li::marker,
+.fl-blog-content--v2 ol.law-steps > li::marker {
+  content: "";
+}
+.fl-blog-content--v2 .law-steps li {
+  counter-increment: law-step;
+  position: relative;
+  margin: 0 0 .75rem;
+  padding: .875rem 1rem .875rem 3.625rem;
+  border: 1px solid #e3dcf5;
+  border-radius: 8px;
+  background: #faf9ff;
+}
+.fl-blog-content--v2 .law-steps li::before {
+  content: counter(law-step);
+  position: absolute;
+  top: 50%;
+  left: .875rem;
+  display: grid;
+  width: 1.875rem;
+  height: 1.875rem;
+  place-items: center;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: #7a3ef2;
+  color: #fff;
+  font-size: .8125rem;
+  font-weight: 800;
+}
+.fl-blog-content--v2 .law-checklist { margin: 1.625rem 0; padding: 0; list-style: none; }
+.fl-blog-content--v2 .law-checklist li { position: relative; padding-left: 1.875rem; }
+.fl-blog-content--v2 .law-checklist li::before { content: "✓"; position: absolute; left: 0; color: #16894a; font-weight: 800; }
+.fl-blog-content--v2 :where(.law-fees, .law-compare) { font-size: .9375rem; }
+
+@media (max-width: 480px) {
+  .fl-blog-content--v2 { font-size: 1rem; line-height: 1.7; }
+  .fl-blog-content--v2 .law-facts { grid-template-columns: 1fr; }
+}
+
