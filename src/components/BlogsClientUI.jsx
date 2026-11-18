@@ -5,6 +5,7 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 // (Optional) Keep the renderer import if you still want it as a fallback.
 // import EditorJsRenderer from "./EditorJsRenderer";
 import BlogSidebarContactForm from "./BlogSidebarContactForm";
+import BlogCard from "./BlogCard";
 import { AiOutlineLike, AiTwotoneLike } from "react-icons/ai";
 import { FaRegCopy, FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
@@ -505,7 +506,7 @@ function TableOfContents({ headings, activeId }) {
   );
 }
 
-export default function BlogsClientUI({ blog }) {
+export default function BlogsClientUI({ blog, recentBlogs = [] }) {
   const [currentUrl, setCurrentUrl] = useState("");
   const hasTrackedRef = useRef(false);
   const [mounted, setMounted] = useState(false);
@@ -514,6 +515,7 @@ export default function BlogsClientUI({ blog }) {
   const [copied, setCopied] = useState(false);
   const [readTime, setReadTime] = useState(null);
   const [activeHeadingId, setActiveHeadingId] = useState("");
+  const articleContentRef = useRef(null);
   const blogTitle = normalizeDisplayText(blog.title);
 
   const BLOG_WEBSITE_URL =
@@ -573,32 +575,59 @@ export default function BlogsClientUI({ blog }) {
     }
   }, [blog]);
 
-  // Intersection Observer for active heading tracking
+  // Keep the TOC aligned with the section being read, not just the first
+  // heading that happens to intersect the viewport.
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !articleContentRef.current) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveHeadingId(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: "-120px 0px -70% 0px", // top offset for fixed navbar
-        threshold: 0.3, // more reliable than 0.1
+    const article = articleContentRef.current;
+    const updateActiveHeading = () => {
+      const headingElements = Array.from(article.querySelectorAll("h2[id]"));
+      if (headingElements.length === 0) return;
+
+      // The active section is the last H2 above a responsive reading line.
+      // This works in both scroll directions and accounts for the fixed header.
+      const readingLine = Math.min(
+        Math.max(window.innerHeight * 0.45, 140),
+        420
+      );
+      let active = headingElements[0];
+
+      headingElements.forEach((heading) => {
+        if (heading.getBoundingClientRect().top <= readingLine) {
+          active = heading;
+        }
+      });
+
+      // Keep the final section active when the document has reached its end.
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+        active = headingElements[headingElements.length - 1];
       }
-    );
 
-    // Observe all H2 elements
-    const h2Elements = document.querySelectorAll("h2[id]");
-    h2Elements.forEach((el) => observer.observe(el));
+      setActiveHeadingId((current) =>
+        current === active.id ? current : active.id
+      );
+    };
+
+    let frameId = 0;
+    const handleScroll = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        updateActiveHeading();
+      });
+    };
+
+    updateActiveHeading();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
 
     return () => {
-      h2Elements.forEach((el) => observer.unobserve(el));
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+      if (frameId) window.cancelAnimationFrame(frameId);
     };
-  }, [mounted]);
+  }, [mounted, blog.urlSlug]);
 
   const handleLike = async () => {
     try {
@@ -662,7 +691,7 @@ export default function BlogsClientUI({ blog }) {
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 md:mt-10 mt-0 flex flex-col relative lg:flex-row gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:mt-6 mt-0 flex flex-col relative lg:flex-row gap-8">
         <div className="w-full lg:w-3/4">
           <div className="my-4">
             <nav
@@ -709,13 +738,6 @@ export default function BlogsClientUI({ blog }) {
             {blogTitle}
           </h1>
 
-          <aside className="w-full lg:w-1/4 block lg:hidden  top-20">
-            {/* Desktop Table of Contents & Contact Form: only show on lg and up */}
-            <div className="">
-              <TableOfContents headings={headings} activeId={activeHeadingId} />
-            </div>
-          </aside>
-
           {/* Cover image */}
           {/* Cover image */}
           {blog.image && (
@@ -728,10 +750,14 @@ export default function BlogsClientUI({ blog }) {
               />
             </div>
           )}
+          <div className="">
+              <TableOfContents headings={headings} activeId={activeHeadingId} />
+            </div>
 
           {/* 👇 Always render normalized HTML (shows inline images too) */}
           {htmlToRender ? (
             <div
+              ref={articleContentRef}
               className={`prose fl-blog-content ${presentationClass} max-w-none`}
               dangerouslySetInnerHTML={{
                 __html: optimizeInlineImages(processedHtmlToRender),
@@ -745,9 +771,8 @@ export default function BlogsClientUI({ blog }) {
           {/* Desktop Table of Contents & Contact Form: only show on lg and up */}
           <div className="z-10 sticky top-32">
             <BlogSidebarContactForm />
-            <TableOfContents headings={headings} activeId={activeHeadingId} />
           </div>
-
+          
         </aside>
       </div>
 
@@ -792,19 +817,29 @@ export default function BlogsClientUI({ blog }) {
         </section>
       )}
 
-      {/* Related Blogs */}
-      {blog.relatedBlog?.length > 0 && (
+      {/* Recent Blogs: the open article is excluded server-side. */}
+      {recentBlogs.length > 0 && (
         <section className="max-w-7xl mx-auto py-10 px-4">
-          <h2 className="text-2xl font-medium mb-4">Related Blogs</h2>
-          <ul className="list-disc list-inside">
-            {blog.relatedBlog.map((slug, index) => (
-              <li key={index}>
-                <a href={`/blog/${slug}`} className="text-blue-600 underline">
-                  {slug.replace(/-/g, " ")}
-                </a>
-              </li>
+          <h2 className="text-2xl font-medium mb-6">Recent Blogs</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {recentBlogs.map((post) => (
+              <a key={post.slug} href={`/blogs/${post.slug}`} className="block">
+                <BlogCard
+                  image={post.image || "/images/default-blog.png"}
+                  category={post.category}
+                  date={post.publishedAt ? new Date(post.publishedAt).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  }) : ""}
+                  title={post.title}
+                  summary={post.excerpt}
+                  authorName="Team Factory Licence"
+                  views={post.views}
+                />
+              </a>
             ))}
-          </ul>
+          </div>
         </section>
       )}
       <style jsx>{`

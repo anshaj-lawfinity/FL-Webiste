@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Script from 'next/script';
 import BlogsClientUI from '@/components/BlogsClientUI';
-import { getBlogBySlug, getBlogRobots, getBlogSchema } from '@/lib/blogs';
+import { getBlogBySlug, getBlogRobots, getBlogSchema, getRecentBlogsForBlog } from '@/lib/blogs';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -109,6 +109,7 @@ export default async function BlogDetails({ params }) {
   if (!blog) return notFound();
 
   const blogSchema = getBlogSchema(blog);
+  const recentBlogs = await getRecentBlogsForBlog(resolvedParams.slug);
   const blogSchemaJson = blogSchema
     ? JSON.stringify(blogSchema).replace(/</g, "\\u003c")
     : null;
@@ -131,7 +132,11 @@ export default async function BlogDetails({ params }) {
           gtag('config', 'AW-17199345901');
         `}
       </Script>
-      <BlogsClientUI key={blog._id || blog.id || resolvedParams.slug} blog={blog} />
+      <BlogsClientUI
+        key={blog._id || blog.id || resolvedParams.slug}
+        blog={blog}
+        recentBlogs={recentBlogs}
+      />
     </div>
   );
 }

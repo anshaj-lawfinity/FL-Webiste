@@ -283,9 +283,11 @@ function toRelatedBlogCard(blog) {
   const slug = normalizeBlogSlug(blog);
   return {
     slug,
+    image: blog?.image || "/images/default-blog.png",
     title: firstPresent(blog?.title, blog?.metaTitle, slugToTitle(slug)),
     excerpt: truncateText(firstPresent(blog?.excerpt, blog?.metaDescription, blog?.description, blog?.content)),
     category: firstPresent(blog?.category),
+    views: blog?.views || 0,
     publishedAt: blog?.publishedAt || blog?.updatedAt || blog?.createdAt || null,
   };
 }
@@ -303,6 +305,19 @@ export const getRelatedBlogsForServicePage = cache(async (page, slug, limit = RE
     .sort((a, b) => b.score - a.score || getBlogDateValue(b.blog) - getBlogDateValue(a.blog))
     .slice(0, limit)
     .map(({ blog }) => toRelatedBlogCard(blog));
+});
+
+export const getRecentBlogsForBlog = cache(async (currentSlug, limit = 3) => {
+  const blogs = await fetchPublishedBlogs();
+  if (!Array.isArray(blogs)) return [];
+
+  const normalizedCurrentSlug = normalizeBlogSlug({ urlSlug: currentSlug });
+  return blogs
+    .filter(isSearchablePublishedBlog)
+    .filter((blog) => normalizeBlogSlug(blog) !== normalizedCurrentSlug)
+    .sort((a, b) => getBlogDateValue(b) - getBlogDateValue(a))
+    .slice(0, limit)
+    .map(toRelatedBlogCard);
 });
 
 // Full article payload (blocks + HTML content + schemaMarkup) — list API omits body content.

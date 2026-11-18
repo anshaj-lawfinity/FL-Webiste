@@ -104,7 +104,7 @@ const HeroForm = ({ title, description, serviceName }) => {
   }, [pathname]);
 
   return (
-    <div className="max-w-lg shadow-2xl mx-auto bg-white md:p-4 p-2 rounded-2xl">
+    <div className="max-w-lg shadow-xl mx-auto bg-white md:p-4 p-2 rounded-2xl mb-5">
       <DuplicateLeadThankYouModal
         isOpen={showDuplicateThankYou}
         onClose={() => setShowDuplicateThankYou(false)}
