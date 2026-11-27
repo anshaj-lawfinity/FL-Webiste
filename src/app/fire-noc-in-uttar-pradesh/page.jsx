@@ -2,6 +2,7 @@
 
 import FireNOCUPPage from "@/components/pages/FireNOCUPPage";
 import { CmsLandingBoundary } from "@/components/cms/FactoryCmsJsonLd";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
 import { buildLandingPageMetadata, getFactoryCmsLandingPage } from "@/lib/cms";
 
 const LANDING_SLUG = "fire-noc-in-uttar-pradesh";
@@ -54,6 +55,7 @@ export default async function Page() {
       <link rel="preload" as="image" href="/assets/factory-fire-noc-apply-online-up.webp" fetchPriority="high" media="(min-width: 768px)" />
       <link rel="preload" as="image" href="/assets/factory-fire-noc-apply-online-up-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
       <FireNOCUPPage page={page} />
+      <RecentBlogsSection />
       <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );

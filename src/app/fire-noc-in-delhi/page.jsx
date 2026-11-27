@@ -2,6 +2,7 @@
 
 import FireNOCDelhiPage from "@/components/pages/FireNOCDelhiPage";
 import { CmsLandingBoundary } from "@/components/cms/FactoryCmsJsonLd";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
 import { buildLandingPageMetadata, getFactoryCmsLandingPage } from "@/lib/cms";
 
 const LANDING_SLUG = "fire-noc-in-delhi";
@@ -55,6 +56,7 @@ export default async function Page() {
       <link rel="preload" as="image" href="/assets/fire-certificate-renewal-in-delhi.webp" fetchPriority="high" media="(min-width: 768px)" />
       <link rel="preload" as="image" href="/assets/fire-certificate-renewal-in-delhi-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
       <FireNOCDelhiPage page={page} />
+      <RecentBlogsSection />
       <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );

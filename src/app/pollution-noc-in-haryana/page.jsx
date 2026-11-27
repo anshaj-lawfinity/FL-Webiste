@@ -2,6 +2,7 @@
 
 import PollutionNOCHaryanaPage from "@/components/pages/PollutionNOCHaryanaPage";
 import { CmsLandingBoundary } from "@/components/cms/FactoryCmsJsonLd";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
 import { buildLandingPageMetadata, getFactoryCmsLandingPage } from "@/lib/cms";
 
 const LANDING_SLUG = "pollution-noc-in-haryana";
@@ -84,6 +85,7 @@ export default async function Page() {
       <link rel="preload" as="image" href="/assets/factory-pollution-certificate-in-haryana.webp" fetchPriority="high" media="(min-width: 768px)" />
       <link rel="preload" as="image" href="/assets/factory-pollution-certificate-in-haryana-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
       <PollutionNOCHaryanaPage page={page} />
+      <RecentBlogsSection />
       <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );

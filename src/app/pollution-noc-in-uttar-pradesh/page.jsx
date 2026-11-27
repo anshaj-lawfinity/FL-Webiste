@@ -2,6 +2,7 @@
 
 import PollutionNOCUPPage from "@/components/pages/PollutionNOCUPPage";
 import { CmsLandingBoundary } from "@/components/cms/FactoryCmsJsonLd";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
 import { buildLandingPageMetadata, getFactoryCmsLandingPage } from "@/lib/cms";
 
 const LANDING_SLUG = "pollution-noc-in-uttar-pradesh";
@@ -53,6 +54,7 @@ export default async function Page() {
       <link rel="preload" as="image" href="/assets/pollution-control-board-license-in-up.webp" fetchPriority="high" media="(min-width: 768px)" />
       <link rel="preload" as="image" href="/assets/pollution-control-board-license-in-up-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
       <PollutionNOCUPPage page={page} />
+      <RecentBlogsSection />
       <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );

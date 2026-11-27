@@ -2,6 +2,7 @@
 
 import PollutionNOCDelhiPage from "@/components/pages/PollutionNOCDelhiPage";
 import { CmsLandingBoundary } from "@/components/cms/FactoryCmsJsonLd";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
 import { buildLandingPageMetadata, getFactoryCmsLandingPage } from "@/lib/cms";
 
 const LANDING_SLUG = "pollution-noc-in-delhi";
@@ -49,6 +50,7 @@ export default async function Page() {
       <link rel="preload" as="image" href="/assets/pollution-noc-for-factory-in-delhi.webp" fetchPriority="high" media="(min-width: 768px)" />
       <link rel="preload" as="image" href="/assets/pollution-noc-for-factory-in-delhi-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
       <PollutionNOCDelhiPage page={page} />
+      <RecentBlogsSection />
       <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );

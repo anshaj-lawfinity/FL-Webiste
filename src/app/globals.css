@@ -362,6 +362,9 @@ svg[data-cms-heading-icon="true"] {
 }
 .fl-blog-content--v2 :where(th, td) { padding: .6875rem .875rem; text-align: left; }
 .fl-blog-content--v2 th { background: #7a3ef2; color: #fff; }
+.fl-blog-content :is(thead, tbody) > tr:first-child > :is(th, td) {
+  color: #ffffff !important;
+}
 .fl-blog-content--v2 tr:nth-child(even) td { background: #f8f6ff; }
 
 .fl-blog-content--v2 :where(.law-quick-answer, .law-tip, .law-caution, .law-warning, .law-takeaway) {

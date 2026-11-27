@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import CmsDynamicLandingPage from "@/components/pages/CmsDynamicLandingPage";
 import { CmsLandingBoundary } from "@/components/cms/FactoryCmsJsonLd";
 import { buildCmsMetadata, getFactoryCmsLandingPageLive, isPublishedCmsLandingPage } from "@/lib/cms";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
 
 // Always resolve CMS slug from CRM on request — avoids stale 404 after SEO publishes.
 export const dynamic = "force-dynamic";
@@ -45,6 +46,7 @@ export default async function CmsLandingSlugPage({ params }) {
   return (
     <>
       <CmsDynamicLandingPage page={page} />
+      <RecentBlogsSection />
       <CmsLandingBoundary slug={slug} page={page} />
     </>
   );

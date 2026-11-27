@@ -2,6 +2,7 @@
 
 import FireNOCHaryanaPage from "@/components/pages/FireNOCHaryanaPage";
 import { CmsLandingBoundary } from "@/components/cms/FactoryCmsJsonLd";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
 import { buildLandingPageMetadata, getFactoryCmsLandingPage } from "@/lib/cms";
 
 const LANDING_SLUG = "fire-noc-in-haryana";
@@ -54,6 +55,7 @@ export default async function Page() {
       <link rel="preload" as="image" href="/assets/fire-noc-renewal-haryana.webp" fetchPriority="high" media="(min-width: 768px)" />
       <link rel="preload" as="image" href="/assets/fire-noc-renewal-haryana-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
       <FireNOCHaryanaPage page={page} />
+      <RecentBlogsSection />
       <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );

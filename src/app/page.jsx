@@ -95,6 +95,7 @@ import CallToActionSection from "@/components/CallToActionSection";
 import FaqSection from "@/components/FaqSection";
 import UniversalFeeCalculator from "@/components/UniversalFeeCalculator";
 import ExtendedContent from "@/components/ExtendedContent";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
 import { CmsStaticSyncBoundary } from "@/components/cms/FactoryCmsJsonLd";
 
 const Page = () => {
@@ -131,6 +132,7 @@ const Page = () => {
 
       <ExtendedContent />
       <FaqSection />
+      <RecentBlogsSection />
       {/* CMS sync streams after shell — avoids blocking TTFB on CMS fetch */}
       <CmsStaticSyncBoundary pageKey="home" />
     </>

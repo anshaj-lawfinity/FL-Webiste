@@ -1,5 +1,6 @@
 import FactoryLicenceUttarPradeshPage from "@/components/pages/FactoryLicenceUttarPradeshPage";
 import { CmsLandingBoundary } from "@/components/cms/FactoryCmsJsonLd";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
 import { buildLandingPageMetadata, getFactoryCmsLandingPage } from "@/lib/cms";
 
 const LANDING_SLUG = "factory-licence-in-uttar-pradesh";
@@ -54,6 +55,7 @@ export default async function Page() {
       <link rel="preload" as="image" href="/assets/factories-act-license-in-up.webp" fetchPriority="high" media="(min-width: 768px)" />
       <link rel="preload" as="image" href="/assets/factories-act-license-in-up-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
       <FactoryLicenceUttarPradeshPage page={page} />
+      <RecentBlogsSection />
       <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );
