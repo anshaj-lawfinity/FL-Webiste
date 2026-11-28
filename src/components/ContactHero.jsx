@@ -22,7 +22,7 @@ export default function ContactUs() {
         </div>
       </div>
 
-      <div className="flex flex-col max-w-7xl mx-auto lg:flex-row justify-between mt-10 px-4 gap-4    ">
+      <div className="flex flex-col max-w-7xl mx-auto lg:flex-row lg:items-start justify-between mt-10 px-4 gap-8 pb-12">
         <div className="lg:w-1/2 space-y-6">
           <h2 className="text-4xl font-semibold text-gray-800">
             We are here to help you.
@@ -37,13 +37,12 @@ export default function ContactUs() {
           <div className="mt-10 grid md:grid-cols-2 grid-cols-1 gap-6 text-gray-700">
             {/* Location 1 */}
             <div>
-              <h4 className="font-extrabold">Noida Office</h4>
+              <h4 className="font-extrabold">Ghaziabad Office</h4>
               <p className="mt-2 text-sm">
-                Coco County, Plot No. GH-03 C, Sector-10, Greater Noida West,
-                Uttar Pradesh 201309
+              3F - CS -91, third floor, Ansal Plaza, Sector -1, Vaishali, Ghaziabad, UP -201010
               </p>
               <p className="text-sm mt-2">
-                <span className="font-medium"></span> +91 93111 17064
+                <span className="font-medium"></span> +91 99107 92080
               </p>
             </div>
 
@@ -54,7 +53,7 @@ export default function ContactUs() {
                 GLS Avenue 51. Sector 92 Gurgaon 122505.
               </p>
               <p className="text-sm mt-2">
-                <span className="font-medium"></span> +91 95400 34687
+                <span className="font-medium"></span> +91 87961 02747
               </p>
             </div>
 
@@ -72,8 +71,7 @@ export default function ContactUs() {
             <div>
               <h4 className="font-extrabold">Lucknow Office</h4>
               <p className="mt-2 text-sm">
-                2nd Floor, JSV Hyundai Building CP-53, near Engineering College
-                Chauraha, near CNG Petrol Pump, Lucknow, Uttar Pradesh 226021{" "}
+               27, Kamla Nehru Nagar, Shankar Puri, Kamta, Lucknow, Uttar Pradesh 226028, India
               </p>
               <p className="text-sm mt-2">
                 <span className="font-medium"></span> +91 72338 11034
@@ -100,13 +98,11 @@ export default function ContactUs() {
           </div>
         </div>
 
-        {/* Right Section */}
-        <div className="lg:w-1/2 flex items-center justify-center  mt-10 lg:mt-0 bg-[#7A3EF2]">
+        {/* Contact form — sticky on desktop, no extra purple wrapper */}
+        <div className="lg:w-1/2 w-full flex justify-center lg:sticky lg:top-24">
           <ContactForm />
         </div>
       </div>
-
-      {/* Left Section */}
     </div>
   );
 }

@@ -1,22 +1,223 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Head from "next/head";
 import { FaPlus, FaMinus } from "react-icons/fa";
 // (Optional) Keep the renderer import if you still want it as a fallback.
 // import EditorJsRenderer from "./EditorJsRenderer";
 import BlogSidebarContactForm from "./BlogSidebarContactForm";
+import BlogCard from "./BlogCard";
 import { AiOutlineLike, AiTwotoneLike } from "react-icons/ai";
 import { FaRegCopy, FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
 import { FaRegShareFromSquare } from "react-icons/fa6";
-import { IoClose } from "react-icons/io5";
-
+import {
+  getBlogPresentationClass,
+  normalizeBlogPresentationVersion,
+  sanitizeBlogHtml,
+} from "@/lib/blogPresentation.mjs";
+import { homepageContent } from "@/data/cta";
+import ContactFormModal from "./ContactFormModal";
 /* =========================
    Helpers
    ========================= */
 
+function decodeHtmlEntities(text = "") {
+  return String(text)
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'");
+}
+
+function normalizeDisplayText(text = "") {
+  return decodeHtmlEntities(text)
+    .replace(/\u00a0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function escapeHtmlAttribute(text = "") {
+  return normalizeDisplayText(text)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+const BLOG_IMAGE_ALT_OVERRIDES = {
+  "renewable-energy-factories-fire-noc-mandatory-for-solar-and-ev-manufacturing-in-delhi": [
+    "Fire Noc For Solar And Ev Units",
+    "Fire Noc For Ev And Solar Factories",
+  ],
+  "fire-noc-for-industrial-building-construction": [
+    "Industrial Building Fire Regulations",
+    "Fire Noc For Industrial Construction",
+  ],
+  "factory-licence-for-cosmetic-manufacturing-units": [
+    "Cosmetic Manufacturing Licence in India",
+    "Cosmetic Factory Licence Requirements",
+  ],
+  "why-your-business-may-get-penalized-without-a-valid-factory-licence-penalty": [
+    "Factory Licence Penalty Reasons",
+    "Penalty For Operating Without Factory Licence",
+  ],
+  "how-to-get-pollution-noc-for-your-factory-or-business-step-by-step-process": [
+    "Pollution Noc For Factory Operations",
+    "Factory Pollution Noc Process",
+  ],
+  "what-is-cte-and-cto": [
+    "Factory Pollution Compliance Requirements",
+    "What Is Cte And Cto",
+  ],
+  "top-new-factory-compliance-mistakes-and-how-to-avoid-them": [
+    "Common Factory Compliance Mistakes",
+    "Factory Compliance Checklist",
+  ],
+};
+
+function BlogCta() {
+  const { cta, ctaText, buttonText } = homepageContent.footer;
+  const [showPopup, setShowPopup] = useState(false);
+  return (
+    <>
+    <div className="blog-inline-cta">
+      <div>
+        <h2>{cta}</h2>
+        <p>{ctaText}</p>
+      </div>
+      <button 
+      type="button"
+      className="flex-1 bg-[#7A3EF2] text-white font-semibold py-3.5 rounded-full shadow-lg hover:bg-[#6b2ee8] transition-colors focus:outline-none focus:ring-2 focus:ring-[#7A3EF2] focus:ring-offset-2"
+      onClick={() => setShowPopup(true)}
+      aria-label={`${buttonText} - Open contact form`}
+      >{buttonText}</button>
+    </div>
+    <ContactFormModal isOpen={showPopup} onClose={() => setShowPopup(false)} />
+    </>
+  );
+}
+
+function getBlogImageAlt(blog, imageIndex = 0) {
+  const slug = blog?.urlSlug || blog?.slug || "";
+  const override = BLOG_IMAGE_ALT_OVERRIDES[slug]?.[imageIndex];
+  if (override) return override;
+
+  return (
+    normalizeDisplayText(blog?.title || blog?.metaTitle || slug.replace(/-/g, " ")) ||
+    "Factory Licence"
+  );
+}
+
+function applyImageAltAttribute(attrs = "", alt = "") {
+  const safeAlt = escapeHtmlAttribute(alt);
+  if (/(\s)alt\s*=\s*(['"])[\s\S]*?\2/i.test(attrs)) {
+    return attrs.replace(/(\s)alt\s*=\s*(['"])[\s\S]*?\2/i, `$1alt="${safeAlt}"`);
+  }
+  return `${attrs} alt="${safeAlt}"`;
+}
+
+const INTERNAL_BLOG_HOSTS = new Set(["factorylicence.in", "www.factorylicence.in"]);
+
+function isInternalBlogHref(href = "") {
+  const value = String(href).trim();
+  if (!value || value.startsWith("#") || value.startsWith("mailto:") || value.startsWith("tel:")) {
+    return false;
+  }
+  if (value.startsWith("/")) return true;
+  try {
+    return INTERNAL_BLOG_HOSTS.has(new URL(value).hostname);
+  } catch {
+    return false;
+  }
+}
+
+function toRelativeBlogHref(href = "") {
+  if (href.startsWith("/")) return href;
+  try {
+    const url = new URL(href);
+    return `${url.pathname}${url.search}${url.hash}` || "/";
+  } catch {
+    return href;
+  }
+}
+
+// Blog article links: same-site URLs become relative paths and stay dofollow.
+function applyBlogInternalLinkPolicy(html = "") {
+  return String(html).replace(/<a\b([^>]*)>/gi, (match, attrs) => {
+    const hrefMatch = attrs.match(/\bhref\s*=\s*(["'])(.*?)\1/i);
+    if (!hrefMatch) return match;
+
+    const href = hrefMatch[2].trim();
+    if (!isInternalBlogHref(href)) return match;
+
+    let cleanedAttrs = attrs
+      .replace(/\bhref\s*=\s*(["'])(.*?)\1/i, `href="${toRelativeBlogHref(href)}"`)
+      .replace(/\btarget\s*=\s*(["'])[^"']*\1/gi, "")
+      .trim();
+
+    const relMatch = cleanedAttrs.match(/\brel\s*=\s*(["'])(.*?)\1/i);
+    if (relMatch) {
+      const relTokens = relMatch[2]
+        .split(/\s+/)
+        .filter((token) => token && token !== "nofollow" && token !== "noopener" && token !== "noreferrer");
+      cleanedAttrs = cleanedAttrs.replace(/\brel\s*=\s*(["'])[^"']*\1/gi, "").trim();
+      if (relTokens.length) {
+        cleanedAttrs = `${cleanedAttrs} rel="${relTokens.join(" ")}"`.trim();
+      }
+    }
+
+    return cleanedAttrs ? `<a ${cleanedAttrs}>` : "<a>";
+  });
+}
+
+function normalizeBlogHtml(html = "") {
+  return applyBlogInternalLinkPolicy(
+    demoteConclusionBodyHeadings(String(html))
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\u00a0/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/([.!?])((?:<\/?[^>]+>)*)\s*(?=[A-Z])/g, "$1$2 ")
+    .replace(/text-align\s*:\s*justify\s*;?/gi, "")
+    .replace(/word-spacing\s*:[^;"']*;?/gi, "")
+    .replace(/letter-spacing\s*:[^;"']*;?/gi, "")
+  );
+}
+
+function demoteConclusionBodyHeadings(html = "") {
+  let afterConclusion = false;
+
+  return String(html).replace(
+    /<h([1-6])([^>]*)>([\s\S]*?)<\/h\1>/gi,
+    (match, level, attrs, content) => {
+      const text = normalizeDisplayText(content.replace(/<[^>]*>/g, ""));
+      const lower = text.toLowerCase();
+
+      if (/^(faqs?|frequently asked questions)$/.test(lower)) {
+        afterConclusion = false;
+        return match;
+      }
+
+      if (lower === "conclusion") {
+        afterConclusion = true;
+        return match;
+      }
+
+      const looksLikeBodyCopy =
+        text.length > 80 && /[.!?]/.test(text) && Number(level) <= 3;
+
+      if (afterConclusion && looksLikeBodyCopy) {
+        return `<p${attrs}>${content}</p>`;
+      }
+
+      return match;
+    }
+  );
+}
+
 // Convert Editor.js data -> HTML (supports common blocks & images)
-function editorJsToHtml(data) {
+function editorJsToHtml(data, blog) {
   if (!data || !Array.isArray(data.blocks)) return "";
 
   const esc = (s) =>
@@ -44,6 +245,7 @@ function editorJsToHtml(data) {
 
   let html = "";
   let h2Counter = 0; // Counter for H2 headings
+  let imageCounter = 1;
 
   for (const block of data.blocks) {
     const t = block?.type;
@@ -79,8 +281,9 @@ function editorJsToHtml(data) {
         break;
       case "image": {
         const src = d.file?.url || d.url || "";
-        const alt = esc(d.caption || "");
+        const alt = esc(d.alt || d.altText || d.caption || getBlogImageAlt(blog, imageCounter));
         if (src) html += `<img src="${src}" alt="${alt}" />`;
+        imageCounter++;
         break;
       }
       case "table": {
@@ -136,7 +339,7 @@ function extractH2Headings(html) {
 
   while ((match = h2Regex.exec(html)) !== null) {
     const id = match[1];
-    const text = match[2].replace(/<[^>]*>/g, ""); // Strip HTML tags
+    const text = normalizeDisplayText(match[2].replace(/<[^>]*>/g, ""));
     headings.push({ id, text });
   }
 
@@ -183,7 +386,7 @@ function extractHtml(blog) {
 function getNormalizedHtml(blog) {
   const ed = extractEditorData(blog);
   if (ed) {
-    const html = editorJsToHtml(ed);
+    const html = editorJsToHtml(ed, blog);
     return processHtmlWithIds(html);
   }
 
@@ -303,25 +506,22 @@ function TableOfContents({ headings, activeId }) {
   );
 }
 
-export default function BlogsClientUI({ blog }) {
+export default function BlogsClientUI({ blog, recentBlogs = [] }) {
   const [currentUrl, setCurrentUrl] = useState("");
   const hasTrackedRef = useRef(false);
   const [mounted, setMounted] = useState(false);
   const [likes, setLikes] = useState(blog.likes || 0);
   const [hasLiked, setHasLiked] = useState(false);
-  const [isCommenting, setIsCommenting] = useState(false);
-  const [comments, setComments] = useState([]);
   const [copied, setCopied] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
   const [readTime, setReadTime] = useState(null);
   const [activeHeadingId, setActiveHeadingId] = useState("");
-
-  console.log(blog);
+  const articleContentRef = useRef(null);
+  const blogTitle = normalizeDisplayText(blog.title);
 
   const BLOG_WEBSITE_URL =
+    process.env.NEXT_PUBLIC_BLOG_API_URL ||
     process.env.BLOG_WEBSITE_URL ||
-    "https://internal.lawfinity.in";
+    "/api/crm";
 
   useEffect(() => {
     setMounted(true);
@@ -331,12 +531,11 @@ export default function BlogsClientUI({ blog }) {
     }
 
     if (!hasTrackedRef.current) {
-      fetch(
-        `${BLOG_WEBSITE_URL}/api/public/blog/by-slug/${blog.urlSlug}/views`,
-        {
-          method: "POST",
-        }
-      );
+      fetch(`${BLOG_WEBSITE_URL}/api/public/blog/by-slug/${blog.urlSlug}/views`, {
+        method: "POST",
+      }).catch(() => {
+        // Non-blocking — view count may fail offline or when CRM is unreachable.
+      });
       hasTrackedRef.current = true;
     }
 
@@ -344,19 +543,6 @@ export default function BlogsClientUI({ blog }) {
     if (liked) {
       setHasLiked(true);
     }
-  }, [blog.urlSlug]);
-
-  useEffect(() => {
-    const fetchComments = async () => {
-      const res = await fetch(
-        `${BLOG_WEBSITE_URL}/api/public/blog/by-slug/${blog.urlSlug}/comments?approved=1`
-      );
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        setComments(data);
-      }
-    };
-    fetchComments();
   }, [blog.urlSlug]);
 
   // Read time that works for both Editor.js & HTML
@@ -389,32 +575,59 @@ export default function BlogsClientUI({ blog }) {
     }
   }, [blog]);
 
-  // Intersection Observer for active heading tracking
+  // Keep the TOC aligned with the section being read, not just the first
+  // heading that happens to intersect the viewport.
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || !articleContentRef.current) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveHeadingId(entry.target.id);
-          }
-        });
-      },
-      {
-        rootMargin: "-120px 0px -70% 0px", // top offset for fixed navbar
-        threshold: 0.3, // more reliable than 0.1
+    const article = articleContentRef.current;
+    const updateActiveHeading = () => {
+      const headingElements = Array.from(article.querySelectorAll("h2[id]"));
+      if (headingElements.length === 0) return;
+
+      // The active section is the last H2 above a responsive reading line.
+      // This works in both scroll directions and accounts for the fixed header.
+      const readingLine = Math.min(
+        Math.max(window.innerHeight * 0.45, 140),
+        420
+      );
+      let active = headingElements[0];
+
+      headingElements.forEach((heading) => {
+        if (heading.getBoundingClientRect().top <= readingLine) {
+          active = heading;
+        }
+      });
+
+      // Keep the final section active when the document has reached its end.
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+        active = headingElements[headingElements.length - 1];
       }
-    );
 
-    // Observe all H2 elements
-    const h2Elements = document.querySelectorAll("h2[id]");
-    h2Elements.forEach((el) => observer.observe(el));
+      setActiveHeadingId((current) =>
+        current === active.id ? current : active.id
+      );
+    };
+
+    let frameId = 0;
+    const handleScroll = () => {
+      if (frameId) return;
+      frameId = window.requestAnimationFrame(() => {
+        frameId = 0;
+        updateActiveHeading();
+      });
+    };
+
+    updateActiveHeading();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
 
     return () => {
-      h2Elements.forEach((el) => observer.unobserve(el));
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+      if (frameId) window.cancelAnimationFrame(frameId);
     };
-  }, [mounted]);
+  }, [mounted, blog.urlSlug]);
 
   const handleLike = async () => {
     try {
@@ -435,34 +648,6 @@ export default function BlogsClientUI({ blog }) {
     }
   };
 
-  const handleCommentSubmit = async (e) => {
-    setIsSubmitting(true);
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const name = formData.get("user");
-    const email = "";
-    const content = formData.get("content");
-
-    const res = await fetch(
-      `${BLOG_WEBSITE_URL}/api/public/blog/by-slug/${blog.urlSlug}/comments`,
-      {
-        method: "POST",
-        body: JSON.stringify({ name, email, content }),
-        headers: { "Content-Type": "application/json" },
-      }
-    );
-    if (res.ok) {
-      setShowPopup(true);
-      e.target.reset();
-      setIsSubmitting(false);
-    } else {
-      alert("Failed to submit comment.");
-      setIsSubmitting(false);
-    }
-  };
-
-  if (!mounted) return null;
-
   function optimizeCloudinary(url, width = 800) {
     if (!url || !url.includes("res.cloudinary.com")) return url;
     return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width}/`);
@@ -470,46 +655,41 @@ export default function BlogsClientUI({ blog }) {
 
   // 🔥 One normalized HTML for everything (shows images inline)
   const htmlToRender = getNormalizedHtml(blog);
-  const headings = extractH2Headings(htmlToRender);
+  const normalizedHtmlToRender = normalizeBlogHtml(htmlToRender);
+  const presentationVersion = normalizeBlogPresentationVersion(blog.presentationVersion);
+  const processedHtmlToRender = presentationVersion === 2
+    ? sanitizeBlogHtml(normalizedHtmlToRender, presentationVersion)
+    : normalizedHtmlToRender;
+  const presentationClass = getBlogPresentationClass(presentationVersion);
+  const headings = extractH2Headings(processedHtmlToRender);
 
   function optimizeInlineImages(html) {
     if (!html) return html;
+    let imageCounter = 1;
     return html.replace(
       /<img([^>]*)src="([^"]+)"([^>]*)>/gi,
       (match, before, url, after) => {
         const optimized = optimizeCloudinary(url, 900);
-        return `<img${before}src="${optimized}"${after} loading="lazy" style="max-width:100%;height:auto;border-radius:6px" />`;
+        const remainingAttrs = `${before}${after}`.replace(/\s*\/\s*$/, "");
+        const attrsWithAlt = applyImageAltAttribute(
+          remainingAttrs,
+          getBlogImageAlt(blog, imageCounter)
+        );
+        imageCounter++;
+        return `<img${attrsWithAlt} src="${optimized}" loading="lazy" style="max-width:100%;height:auto;border-radius:6px" />`;
       }
     );
   }
 
   return (
     <div className="min-h-screen text-justify md:mt-20 mt-20">
-      <Head>
-        <title>{blog.metaTitle}</title>
-        <meta name="description" content={blog.metaDescription} />
-        <meta property="og:title" content={blog.metaTitle} />
-        <meta property="og:description" content={blog.metaDescription} />
-        <meta property="og:image" content={blog.image} />
-        <meta
-          property="og:url"
-          content={`https://internal.lawfinity.in/blog/${blog.urlSlug}`}
-        />
-        <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="Lawfinity" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={blog.metaTitle} />
-        <meta name="twitter:description" content={blog.metaDescription} />
-        <meta name="twitter:image" content={blog.image} />
-      </Head>
-
       {/* Hero Section */}
       <section className="relative w-full max-w-7xl mx-auto overflow-hidden">
         {/* 16:9 box */}
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 md:mt-10 mt-0 flex flex-col relative lg:flex-row gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:mt-6 mt-0 flex flex-col relative lg:flex-row gap-8">
         <div className="w-full lg:w-3/4">
           <div className="my-4">
             <nav
@@ -530,11 +710,11 @@ export default function BlogsClientUI({ blog }) {
                         href={item.href}
                         className="text-blue-600 hover:underline"
                       >
-                        {item.label}
+                        {normalizeDisplayText(item.label)}
                       </a>
                     ) : (
                       <span className="text-gray-600 truncate max-w-[200px] md:max-w-none">
-                        {item.label}
+                        {normalizeDisplayText(item.label)}
                       </span>
                     )}
                   </div>
@@ -552,14 +732,9 @@ export default function BlogsClientUI({ blog }) {
             </p>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">{blog.title}</h1>
-
-          <aside className="w-full lg:w-1/4 block lg:hidden  top-20">
-            {/* Desktop Table of Contents & Contact Form: only show on lg and up */}
-            <div className="">
-              <TableOfContents headings={headings} activeId={activeHeadingId} />
-            </div>
-          </aside>
+          <h1 className="text-3xl md:text-4xl font-bold leading-tight text-left mb-4">
+            {blogTitle}
+          </h1>
 
           {/* Cover image */}
           {/* Cover image */}
@@ -567,31 +742,35 @@ export default function BlogsClientUI({ blog }) {
             <div className="w-full my-6">
               <img
                 src={optimizeCloudinary(blog.image, 1200)}
-                alt={blog.title}
+                alt={getBlogImageAlt(blog, 0)}
                 loading="lazy"
                 className="w-full h-auto object-cover rounded-md"
               />
             </div>
           )}
+          <div className="">
+              <TableOfContents headings={headings} activeId={activeHeadingId} />
+            </div>
 
           {/* 👇 Always render normalized HTML (shows inline images too) */}
           {htmlToRender ? (
             <div
-              className="prose max-w-none"
+              ref={articleContentRef}
+              className={`prose fl-blog-content ${presentationClass} max-w-none`}
               dangerouslySetInnerHTML={{
-                __html: optimizeInlineImages(htmlToRender),
+                __html: optimizeInlineImages(processedHtmlToRender),
               }}
             />
           ) : null}
+          <BlogCta />
         </div>
 
         <aside className="w-full lg:w-1/4 hidden lg:block right-0 lg:mt-6 lg:sticky lg:top-32">
           {/* Desktop Table of Contents & Contact Form: only show on lg and up */}
           <div className="z-10 sticky top-32">
-            <TableOfContents headings={headings} activeId={activeHeadingId} />
             <BlogSidebarContactForm />
           </div>
-
+          
         </aside>
       </div>
 
@@ -636,185 +815,38 @@ export default function BlogsClientUI({ blog }) {
         </section>
       )}
 
-      {/* Related Blogs */}
-      {blog.relatedBlog?.length > 0 && (
+      {/* Recent Blogs: the open article is excluded server-side. */}
+      {recentBlogs.length > 0 && (
         <section className="max-w-7xl mx-auto py-10 px-4">
-          <h2 className="text-2xl font-medium mb-4">Related Blogs</h2>
-          <ul className="list-disc list-inside">
-            {blog.relatedBlog.map((slug, index) => (
-              <li key={index}>
-                <a href={`/blog/${slug}`} className="text-blue-600 underline">
-                  {slug.replace(/-/g, " ")}
-                </a>
-              </li>
+          <h2 className="text-2xl font-medium mb-6">Recent Blogs</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {recentBlogs.map((post) => (
+              <a key={post.slug} href={`/blogs/${post.slug}`} className="block">
+                <BlogCard
+                  image={post.image || "/images/default-blog.png"}
+                  category={post.category}
+                  date={post.publishedAt ? new Date(post.publishedAt).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  }) : ""}
+                  title={post.title}
+                  summary={post.excerpt}
+                  authorName="Team Factory Licence"
+                  views={post.views}
+                />
+              </a>
             ))}
-          </ul>
+          </div>
         </section>
       )}
-
-      {/* Like Button */}
-      <div className="max-w-7xl mx-auto py-6 px-4">
-        <div className="mt-4">
-          {hasLiked ? (
-            <p className="text-blue-700 font-medium flex gap-3 items-center">
-              Liked <AiTwotoneLike />
-            </p>
-          ) : (
-            <button
-              onClick={handleLike}
-              className="bg-blue-600 hover:bg-blue-700 px-4 py-1 rounded text-white flex gap-3 items-center"
-            >
-              <AiOutlineLike /> Like ({likes})
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Share Section */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <h2 className="text-lg font-medium mb-2">Share this blog</h2>
-        <div className="flex gap4 flex-wrap">
-          <button
-            onClick={() => {
-              navigator.clipboard.writeText(currentUrl);
-              setCopied(true);
-              setTimeout(() => setCopied(false), 2000);
-            }}
-            className="text-gray-600 text-3xl px-4 py-2 rounded hover:scale-110 flex items-center gap-2"
-          >
-            <FaRegCopy />
-            {copied && (
-              <span className="text-green-500 text-xs mt-1 absolute -bottom-4 left-0">
-                Copied!
-              </span>
-            )}
-          </button>
-
-          {typeof navigator !== "undefined" && navigator.share && (
-            <button
-              onClick={() => {
-                navigator
-                  .share({
-                    title: blog.title,
-                    text: "Check out this blog!",
-                    url: currentUrl,
-                  })
-                  .catch((err) => console.error("Sharing failed", err));
-              }}
-              className="text-blue-600 text-3xl px-4 py-2 rounded"
-            >
-              <FaRegShareFromSquare />
-            </button>
-          )}
-
-          <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-              currentUrl
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-800 text-3xl px-4 py-2 rounded"
-          >
-            <FaFacebook />
-          </a>
-
-          <a
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-              currentUrl
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-700 text-3xl px-4 py-2 rounded"
-          >
-            <FaLinkedin />
-          </a>
-
-          <a
-            href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
-              currentUrl
-            )}&text=${encodeURIComponent(blog.title)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 px-4 py-2 rounded text-3xl"
-          >
-            <FaTwitter />
-          </a>
-        </div>
-      </div>
-
-      {/* Comments */}
-      <section className="max-w-7xl mx-auto py-10 px-4">
-        <h2 className="text-2xl font-medium mb-4">Comments</h2>
-
-        <div className="space-y-4 mb-8">
-          {comments.length > 0 ? (
-            comments.map((comment) => (
-              <div
-                key={comment._id}
-                className="border rounded p-4 bg-gray-50 shadow-sm"
-              >
-                <p className="font-semibold text-gray-800">{comment.name}</p>
-                <p className="text-gray-700 mt-1 whitespace-pre-line">
-                  {comment.content}
-                </p>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">No comments yet.</p>
-          )}
-        </div>
-
-        <form onSubmit={handleCommentSubmit} className="space-y-4">
-          <input
-            name="user"
-            placeholder="Your Name"
-            required
-            className="w-full px-3 py-2 border rounded"
-          />
-          <textarea
-            name="content"
-            placeholder="Your Comment"
-            required
-            className="w-full px-3 py-2 border rounded"
-          />
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`px-4 py-2 rounded text-white ${isSubmitting
-                ? "bg-blue-300 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-              }`}
-          >
-            {isSubmitting ? "Submitting..." : "Submit Comment"}
-          </button>
-        </form>
-      </section>
-
-      {showPopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="relative">
-            <p
-              onClick={() => setShowPopup(false)}
-              className="absolute text-red-500 top-0 right-0 p-4 text-2xl cursor-pointer"
-            >
-              <IoClose />
-            </p>
-            <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full text-center animate-fadeIn">
-              <h3 className="text-lg font-semibold mb-2">Thank you!</h3>
-              <p className="text-gray-700">
-                Your comment has been submitted and will appear shortly.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       <style jsx>{`
         :global(.prose) {
           color: #0f172a; /* slate-900 */
           line-height: 1.6;
           word-break: break-word;
           font-size: 1rem; /* slightly smaller base font */
+          text-align: left;
         }
 
         /* Headings */
@@ -838,11 +870,25 @@ export default function BlogsClientUI({ blog }) {
           margin: 0.75rem 0 0.5rem;
           font-weight: 600;
         }
+        :global(.prose h4) {
+          font-size: 1.125rem;
+          line-height: 1.625rem;
+          margin: 0.75rem 0 0.5rem;
+          font-weight: 600;
+        }
+        :global(.prose h5),
+        :global(.prose h6) {
+          font-size: 1rem;
+          line-height: 1.5rem;
+          margin: 0.75rem 0 0.5rem;
+          font-weight: 600;
+        }
 
         /* Paragraphs */
         :global(.prose p) {
           margin: 0.6rem 0;
           color: #0f172a; /* slate-900 */
+          text-align: left !important;
         }
 
         /* Links */
@@ -877,25 +923,43 @@ export default function BlogsClientUI({ blog }) {
         /* Lists */
         :global(.prose ul) {
           list-style-type: disc !important;
-          list-style-position: inside !important;
+          list-style-position: outside !important;
           padding-left: 1.5rem;
           margin: 0.75rem 0;
         }
 
-        // :global(.prose ol) {
-        //   list-style-type: decimal !important;
-        //   list-style-position: inside !important;
-        //   padding-left: 1.5rem;
-        //   margin: 0.75rem 0;
-        //   counter-reset: list-counter;
-        // }
-
-        // :global(.prose ol li) {
-        //   display: list-item !important;
-        // }
+        :global(.prose ol) {
+          list-style-type: decimal !important;
+          list-style-position: outside !important;
+          padding-left: 1.5rem;
+          margin: 0.75rem 0;
+        }
 
         :global(.prose li) {
           margin: 0.25rem 0;
+          padding-left: 0.25rem;
+        }
+
+        :global(.prose blockquote) {
+          border-left: 4px solid #2563eb;
+          margin: 1rem 0;
+          padding: 0.75rem 1rem;
+          background: #eff6ff;
+          color: #1e293b;
+        }
+
+        :global(.prose table) {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 1rem 0;
+          font-size: 0.95rem;
+        }
+
+        :global(.prose td),
+        :global(.prose th) {
+          border: 1px solid #cbd5e1;
+          padding: 0.6rem;
+          vertical-align: top;
         }
       `}</style>
     </div>

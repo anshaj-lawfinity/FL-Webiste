@@ -1,10 +1,16 @@
 // app/factory-licence-in-delhi/page.jsx
 
 import FireNOCUPPage from "@/components/pages/FireNOCUPPage";
-import FactoryCmsDomSync from "@/components/cms/FactoryCmsDomSync";
-import { getFactoryCmsLandingPage } from "@/lib/cms";
+import { CmsLandingBoundary } from "@/components/cms/FactoryCmsJsonLd";
+import RecentBlogsSection from "@/components/RecentBlogsSection";
+import { buildLandingPageMetadata, getFactoryCmsLandingPage } from "@/lib/cms";
 
-export const metadata = {
+const LANDING_SLUG = "fire-noc-in-uttar-pradesh";
+
+// ISR: cache rendered page for 5 minutes instead of blocking on CMS every request.
+export const revalidate = 300;
+
+const fallbackMetadata = {
   title: "Fire NOC in Uttar Pradesh, Apply & Renew Fire NOC Online in Uttar Pradesh - Factorylicence",
   description:
     "Fire NOC in Uttar Pradesh - Apply for Fire NOC in Uttar Pradesh online through Uttar Pradesh Fire Service. Get new Fire NOC, download certificate, and complete Fire NOC renewal online easily.",
@@ -35,12 +41,22 @@ export const metadata = {
   },
 };
 
+export async function generateMetadata() {
+  return buildLandingPageMetadata(LANDING_SLUG, fallbackMetadata);
+}
+
 export default async function Page() {
-  const cmsPage = await getFactoryCmsLandingPage("fire-noc-in-uttar-pradesh");
+  // Server-rendered so the CMS body ships in the initial HTML — avoids the
+  // hardcoded-then-CMS-content flash that the old client-only DOM sync caused.
+  const page = await getFactoryCmsLandingPage(LANDING_SLUG);
+
   return (
     <>
-      <FireNOCUPPage />
-      <FactoryCmsDomSync page={cmsPage} />
+      <link rel="preload" as="image" href="/assets/factory-fire-noc-apply-online-up.webp" fetchPriority="high" media="(min-width: 768px)" />
+      <link rel="preload" as="image" href="/assets/factory-fire-noc-apply-online-up-mobile.jpg" fetchPriority="high" media="(max-width: 767px)" />
+      <FireNOCUPPage page={page} />
+      <RecentBlogsSection />
+      <CmsLandingBoundary slug={LANDING_SLUG} page={page} />
     </>
   );
 }
